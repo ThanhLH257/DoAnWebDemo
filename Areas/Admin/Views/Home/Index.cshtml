@@ -1,0 +1,83 @@
+﻿@{
+    ViewData["Title"] = "Dashboard Thống Kê";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Dùng chung layout
+}
+
+<!-- Tải thư viện vẽ biểu đồ -->
+<script src="[https://cdn.jsdelivr.net/npm/chart.js](https://cdn.jsdelivr.net/npm/chart.js)"></script>
+
+<div class="container mt-4">
+    <h2 class="text-primary fw-bold mb-4"><i class="bi bi-speedometer2"></i> Tổng Quan Hệ Thống</h2>
+
+    <!-- 3 Thẻ Thống kê Cốt lõi -->
+    <div class="row mb-5">
+        <div class="col-md-4">
+            <div class="card bg-info text-white shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Tổng Khách Hàng</h5>
+                    <h2 class="display-5 fw-bold">@ViewBag.TotalUsers</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-dark shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Tổng Đơn Vay</h5>
+                    <h2 class="display-5 fw-bold">@ViewBag.TotalLoanApps</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Tổng Tiền Giải Ngân</h5>
+                    <h2 class="display-5 fw-bold">@ViewBag.TotalDisbursed.ToString("#,##0") đ</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Khu vực Vẽ Biểu Đồ -->
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card shadow">
+                <div class="card-header bg-white">
+                    <h5 class="text-center mb-0">Biểu Đồ Trạng Thái Đơn Vay</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Thẻ canvas để vẽ biểu đồ -->
+                    <canvas id="loanStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script để kích hoạt biểu đồ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var ctx = document.getElementById('loanStatusChart').getContext('2d');
+        var loanStatusChart = new Chart(ctx, {
+            type: 'pie', // Loại biểu đồ: Hình tròn (Pie)
+            data: {
+                // Nhận dữ liệu từ Controller (ViewBag)
+                labels: ['Chờ duyệt (Pending)', 'Đã duyệt (Approved)', 'Từ chối (Rejected)'],
+                datasets: [{
+                    data: [@ViewBag.PendingCount, @ViewBag.ApprovedCount, @ViewBag.RejectedCount],
+                    backgroundColor: [
+                        '#ffc107', // Vàng
+                        '#198754', // Xanh lá
+                        '#dc3545'  // Đỏ
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    });
+</script>

@@ -1,0 +1,106 @@
+﻿@page
+@model DeletePersonalDataModel
+@{
+    ViewData["Title"] = "Xác nhận xóa tài khoản";
+    ViewData["ActivePage"] = ManageNavPages.PersonalData;
+}
+
+<div class="delete-account-container">
+    <div class="d-flex align-items-center mb-4">
+        <div class="bg-danger bg-opacity-10 p-3 rounded-3 me-3">
+            <i class="bi bi-person-x-fill text-danger fs-3"></i>
+        </div>
+        <div>
+            <h4 class="fw-bold text-dark mb-0 text-uppercase" style="letter-spacing: 1px;">@ViewData["Title"]</h4>
+            <p class="text-muted mb-0 small">Hành động này không thể hoàn tác</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-9">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-body p-4 p-md-5">
+
+                    <!-- Cảnh báo cực kỳ quan trọng -->
+                    <div class="alert alert-warning rounded-4 border-0 p-4 mb-4 d-flex align-items-start shadow-sm">
+                        <i class="bi bi-exclamation-triangle-fill fs-2 me-3 text-warning"></i>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-1">BẠN CÓ CHẮC CHẮN MUỐN RỜI ĐI?</h6>
+                            <p class="mb-0 text-dark opacity-75 small lh-base">
+                                Việc xóa dữ liệu này sẽ <strong>xóa vĩnh viễn</strong> tài khoản của bạn và toàn bộ hồ sơ vay vốn liên quan. Dữ liệu này <strong>không thể được khôi phục</strong> sau khi bạn xác nhận.
+                            </p>
+                        </div>
+                    </div>
+
+                    <form id="delete-user" method="post">
+                        <div asp-validation-summary="All" class="text-danger mb-3" role="alert"></div>
+
+                        @if (Model.RequirePassword)
+                        {
+                            <div class="bg-light p-4 rounded-4 mb-4 border border-white">
+                                <div class="form-floating">
+                                    <input asp-for="Input.Password" class="form-control rounded-3 border-0 bg-white" autocomplete="current-password" aria-required="true" placeholder="Nhập mật khẩu của bạn" />
+                                    <label asp-for="Input.Password" class="text-muted fw-bold small">Nhập mật khẩu để xác nhận</label>
+                                    <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                                </div>
+                                <p class="text-muted mt-3 mb-0 small italic">
+                                    <i class="bi bi-info-circle"></i> Vì lý do bảo mật, chúng tôi cần bạn xác nhận mật khẩu trước khi thực hiện hành động này.
+                                </p>
+                            </div>
+                        }
+
+                        <div class="d-grid gap-3">
+                            <button class="btn btn-danger btn-lg py-3 rounded-pill fw-bold shadow-sm hover-lift transition-all" type="submit">
+                                <i class="bi bi-trash3-fill me-2"></i> XÓA DỮ LIỆU & ĐÓNG TÀI KHOẢN
+                            </button>
+                            <a asp-page="./PersonalData" class="btn btn-outline-secondary py-3 rounded-pill fw-bold border-0">
+                                Tôi muốn suy nghĩ lại
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột thông tin phụ bên phải -->
+        <div class="col-lg-3 mt-4 mt-lg-0">
+            <div class="card border-0 rounded-4 shadow-sm bg-light">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-question-circle"></i> Lưu ý</h6>
+                    <p class="small text-muted mb-0">Nếu bạn gặp khó khăn trong quá trình sử dụng, hãy thử liên hệ với đội ngũ hỗ trợ của chúng tôi trước khi quyết định xóa tài khoản nhé!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-lift:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(220, 53, 69, 0.2) !important;
+    }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+
+    .delete-account-container {
+        animation: fadeIn 0.4s ease-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.98);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

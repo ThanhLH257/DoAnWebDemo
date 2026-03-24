@@ -1,8 +1,228 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "FastLoan - Vay vốn siêu tốc";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Banner Hero Section (Có hình ảnh) -->
+<div class="py-5 mb-5 bg-white rounded-4 shadow-sm border overflow-hidden" style="background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);">
+    <div class="container-fluid px-5">
+        <div class="row align-items-center">
+            <!-- Cột chữ -->
+            <div class="col-lg-6 mb-5 mb-lg-0 text-center text-lg-start">
+                <span class="badge bg-primary bg-opacity-10 text-primary mb-3 px-3 py-2 rounded-pill fw-bold">
+                    <i class="bi bi-star-fill text-warning me-1"></i> Nền tảng vay vốn hàng đầu 2026
+                </span>
+                <h1 class="display-4 fw-extrabold text-dark mb-4" style="font-weight: 800;">
+                    Giải pháp tài chính <br />
+                    <span class="text-primary">Nhanh chóng & An toàn</span>
+                </h1>
+                <p class="fs-5 text-secondary mb-5 pe-lg-5">
+                    Đăng ký vay tiền online mọi lúc, mọi nơi. Thủ tục eKYC đơn giản, không cần thế chấp, duyệt tự động bằng công nghệ AI và giải ngân thần tốc trong vòng 24 giờ.
+                </p>
+
+                <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-lg-start gap-3">
+                    @if (!User.Identity.IsAuthenticated)
+                    {
+                        <a href="/Identity/Account/Register" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow fw-bold">
+                            Đăng Ký Vay Ngay <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="LoanApplications" asp-action="Create" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow fw-bold">
+                            Tạo Đơn Vay Mới <i class="bi bi-pencil-square ms-2"></i>
+                        </a>
+                    }
+                    <a href="#calculator-section" class="btn btn-outline-secondary btn-lg px-5 py-3 rounded-pill fw-bold bg-white">
+                        Tính toán khoản vay
+                    </a>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-center justify-content-lg-start mt-4 text-muted font-monospace small">
+                    <div class="me-4"><i class="bi bi-check-circle-fill text-success me-1"></i> Duyệt hồ sơ 5p</div>
+                    <div><i class="bi bi-check-circle-fill text-success me-1"></i> 100% Online</div>
+                </div>
+            </div>
+
+            <!-- Cột hình ảnh -->
+            <div class="col-lg-6 text-center">
+                <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                     alt=""
+                     class="img-fluid rounded-4 shadow-lg border" style="transform: perspective(1000px) rotateY(-5deg); transition: transform 0.3s;" onmouseover="this.style.transform='perspective(1000px) rotateY(0deg)'" onmouseout="this.style.transform='perspective(1000px) rotateY(-5deg)'">
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Thống kê (Numbers Section) -->
+<div class="container mb-5">
+    <div class="row text-center g-4">
+        <div class="col-md-4">
+            <div class="p-4 bg-white rounded-4 shadow-sm border border-light">
+                <h2 class="display-5 fw-bold text-primary mb-0">50,000+</h2>
+                <p class="text-muted fw-semibold mt-2">Khách hàng tin dùng</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4 bg-white rounded-4 shadow-sm border border-light">
+                <h2 class="display-5 fw-bold text-success mb-0">500 Tỷ</h2>
+                <p class="text-muted fw-semibold mt-2">Đã được giải ngân</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4 bg-white rounded-4 shadow-sm border border-light">
+                <h2 class="display-5 fw-bold text-warning mb-0">98%</h2>
+                <p class="text-muted fw-semibold mt-2">Tỷ lệ hài lòng</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tính năng F3: Công cụ dự toán khoản vay (Loan Calculator) -->
+<div id="calculator-section" class="row justify-content-center mb-5">
+    <div class="col-md-8">
+        <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+            <div class="card-header bg-success text-white text-center py-4">
+                <h3 class="mb-0 fw-bold"><i class="bi bi-calculator"></i> Công cụ dự toán khoản vay</h3>
+                <p class="mb-0 text-white-50">Lãi suất minh bạch - Cố định 1.5%/tháng</p>
+            </div>
+            <div class="card-body p-5 bg-white">
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Số tiền muốn vay: <span id="amountLabel" class="text-primary fs-3">10,000,000 đ</span></label>
+                    <input type="range" class="form-range" id="loanAmount" min="1000000" max="100000000" step="1000000" value="10000000">
+                    <div class="d-flex justify-content-between text-muted small fw-bold">
+                        <span>1 Triệu</span>
+                        <span>100 Triệu</span>
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <label class="form-label fw-bold">Kỳ hạn vay: <span id="termLabel" class="text-primary fs-3">6 Tháng</span></label>
+                    <input type="range" class="form-range" id="loanTerm" min="1" max="36" step="1" value="6">
+                    <div class="d-flex justify-content-between text-muted small fw-bold">
+                        <span>1 Tháng</span>
+                        <span>36 Tháng</span>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-4 text-center border" style="background-color: #f8f9fa;">
+                    <h5 class="text-muted mb-2">Số tiền ước tính phải trả mỗi tháng:</h5>
+                    <h1 class="text-danger fw-extrabold display-5 mb-0" id="monthlyPayment">1,755,252 đ</h1>
+                    <p class="text-muted small mt-2 mb-0"><i class="bi bi-info-circle"></i> Tính toán dựa trên công thức dư nợ giảm dần (EMI)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ưu điểm vượt trội (Features) -->
+<div class="container py-5 mb-5 border-top">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-dark">Tại sao nên chọn FastLoan?</h2>
+        <p class="text-muted">Mang đến trải nghiệm tài chính vượt trội so với ngân hàng truyền thống</p>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4 text-center">
+            <div class="p-4 bg-white rounded-4 shadow-sm h-100 border hover-shadow transition">
+                <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-4" style="width: 80px; height: 80px;">
+                    <i class="bi bi-lightning-charge-fill fs-1"></i>
+                </div>
+                <h4 class="fw-bold">Giải ngân siêu tốc</h4>
+                <p class="text-muted">Hệ thống AI xét duyệt hồ sơ hoàn toàn tự động, tiền chuyển thẳng vào tài khoản của bạn chỉ sau 15 phút.</p>
+            </div>
+        </div>
+        <div class="col-md-4 text-center">
+            <div class="p-4 bg-white rounded-4 shadow-sm h-100 border hover-shadow transition">
+                <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-4" style="width: 80px; height: 80px;">
+                    <i class="bi bi-shield-check fs-1"></i>
+                </div>
+                <h4 class="fw-bold">Bảo mật eKYC</h4>
+                <p class="text-muted">Dữ liệu cá nhân và hình ảnh CCCD được mã hóa chuẩn quốc tế. Cam kết tuyệt đối không chia sẻ cho bên thứ ba.</p>
+            </div>
+        </div>
+        <div class="col-md-4 text-center">
+            <div class="p-4 bg-white rounded-4 shadow-sm h-100 border hover-shadow transition">
+                <div class="d-inline-flex align-items-center justify-content-center bg-info bg-opacity-10 text-info rounded-circle mb-4" style="width: 80px; height: 80px;">
+                    <i class="bi bi-phone fs-1"></i>
+                </div>
+                <h4 class="fw-bold">100% Online</h4>
+                <p class="text-muted">Không cần gặp mặt, không cần thế chấp tài sản, không giấy tờ rườm rà. Mọi thao tác đều thực hiện ngay trên Web.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quy trình 3 bước (How it works) -->
+<div class="bg-dark text-white rounded-4 p-5 mb-5 shadow-lg">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Quy trình vay cực kỳ đơn giản</h2>
+        <p class="text-white-50">Chỉ với 3 bước, bạn đã có thể nhận được khoản vay mong muốn</p>
+    </div>
+    <div class="row position-relative">
+        <div class="col-md-4 text-center position-relative mb-4 mb-md-0">
+            <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle mb-3 border border-4 border-dark" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: bold; z-index: 2; position: relative;">1</div>
+            <h5 class="fw-bold">Tạo tài khoản & eKYC</h5>
+            <p class="text-white-50 small px-3">Đăng ký và chụp ảnh CCCD để xác thực danh tính trực tuyến.</p>
+        </div>
+        <div class="col-md-4 text-center position-relative mb-4 mb-md-0">
+            <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle mb-3 border border-4 border-dark" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: bold; z-index: 2; position: relative;">2</div>
+            <h5 class="fw-bold">Chọn khoản vay</h5>
+            <p class="text-white-50 small px-3">Tùy chọn số tiền và kỳ hạn linh hoạt. Gửi đơn chờ AI thẩm định.</p>
+        </div>
+        <div class="col-md-4 text-center position-relative">
+            <div class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded-circle mb-3 border border-4 border-dark" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: bold; z-index: 2; position: relative;">3</div>
+            <h5 class="fw-bold">Nhận tiền ngay</h5>
+            <p class="text-white-50 small px-3">Sau khi được Admin duyệt, tiền sẽ đổ thẳng vào tài khoản của bạn.</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-shadow:hover {
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+        transform: translateY(-5px);
+    }
+
+    .transition {
+        transition: all .3s ease-in-out;
+    }
+</style>
+
+<!-- Javascript xử lý kéo thanh trượt (Thuật toán EMI) -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const amountSlider = document.getElementById('loanAmount');
+        const termSlider = document.getElementById('loanTerm');
+        const amountLabel = document.getElementById('amountLabel');
+        const termLabel = document.getElementById('termLabel');
+        const paymentResult = document.getElementById('monthlyPayment');
+
+        // Hàm tính toán EMI
+        function calculateEMI() {
+            let p = parseInt(amountSlider.value);
+            let n = parseInt(termSlider.value);
+            let r = 0.015; // Lãi suất cố định 1.5%/tháng để Demo
+
+            // Định dạng tiền tệ
+            amountLabel.innerText = p.toLocaleString('vi-VN') + ' đ';
+            termLabel.innerText = n + ' Tháng';
+
+            let emi = 0;
+            if (r > 0) {
+                let mathPower = Math.pow(1 + r, n);
+                emi = (p * r * mathPower) / (mathPower - 1);
+            } else {
+                emi = p / n;
+            }
+
+            paymentResult.innerText = Math.round(emi).toLocaleString('vi-VN') + ' đ';
+        }
+
+        // Lắng nghe sự kiện kéo thanh trượt
+        amountSlider.addEventListener('input', calculateEMI);
+        termSlider.addEventListener('input', calculateEMI);
+
+        // Chạy lần đầu để hiển thị giá trị mặc định
+        calculateEMI();
+    });
+</script>

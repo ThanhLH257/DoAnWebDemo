@@ -1,0 +1,104 @@
+﻿@page
+@model PersonalDataModel
+@{
+    ViewData["Title"] = "Dữ liệu cá nhân";
+    ViewData["ActivePage"] = ManageNavPages.PersonalData;
+}
+
+<div class="personal-data-container">
+    <div class="d-flex align-items-center mb-4">
+        <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+            <i class="bi bi-database-fill-gear text-primary fs-3"></i>
+        </div>
+        <div>
+            <h4 class="fw-bold text-dark mb-0 text-uppercase" style="letter-spacing: 1px;">@ViewData["Title"]</h4>
+            <p class="text-muted mb-0 small">Quản lý và kiểm soát thông tin cá nhân của bạn</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-9">
+            <!-- Khối thông tin chung -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden border-start border-4 border-primary">
+                <div class="card-body p-4 p-md-5">
+                    <p class="text-secondary mb-0 lh-lg">
+                        Tài khoản của bạn tại <strong>FastLoan VN</strong> chứa các thông tin định danh và lịch sử tài chính mà bạn đã cung cấp.
+                        Để đảm bảo quyền riêng tư theo tiêu chuẩn quốc tế, bạn có toàn quyền tải về hoặc yêu cầu xóa bỏ các dữ liệu này khỏi hệ thống.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Khối hành động nguy hiểm -->
+            <div class="card border-0 shadow-sm rounded-4 bg-white">
+                <div class="card-body p-4 p-md-5">
+                    <div class="alert alert-danger rounded-4 border-0 p-4 mb-5 d-flex align-items-start">
+                        <i class="bi bi-exclamation-octagon-fill fs-2 me-3 mt-1"></i>
+                        <div>
+                            <h5 class="fw-bold mb-2">KHU VỰC NGUY HIỂM!</h5>
+                            <p class="mb-0 opacity-75 lh-base">
+                                Việc xóa dữ liệu sẽ dẫn đến việc <strong>vô hiệu hóa vĩnh viễn</strong> tài khoản FastLoan của bạn.
+                                Tất cả lịch sử vay, điểm tín dụng và hồ sơ eKYC sẽ bị hủy và <strong>không thể khôi phục</strong>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <form id="download-data" asp-page="DownloadPersonalData" method="post">
+                                <button class="btn btn-outline-primary btn-lg w-100 py-3 rounded-pill fw-bold shadow-sm hover-lift transition-all" type="submit">
+                                    <i class="bi bi-cloud-arrow-down-fill me-2"></i> TẢI DỮ LIỆU VỀ
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <a id="delete" asp-page="DeletePersonalData" class="btn btn-danger btn-lg w-100 py-3 rounded-pill fw-bold shadow-sm hover-lift transition-all">
+                                <i class="bi bi-person-x-fill me-2"></i> XÓA TÀI KHOẢN
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột thông tin phụ -->
+        <div class="col-lg-3 mt-4 mt-lg-0">
+            <div class="card border-0 rounded-4 shadow-sm bg-info bg-opacity-10">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-info mb-3"><i class="bi bi-shield-lock"></i> Bảo mật</h6>
+                    <p class="small text-secondary mb-0">FastLoan sử dụng mã hóa AES-256 để bảo vệ dữ liệu cá nhân của bạn. Việc tải dữ liệu sẽ được thực hiện qua kết nối an toàn SSL.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-lift:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+
+    .personal-data-container {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
