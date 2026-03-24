@@ -1,0 +1,43 @@
+﻿@{
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayout))
+    {
+        Layout = (string)parentLayout;
+    }
+    else
+    {
+        Layout = "/Views/Shared/_Layout.cshtml";
+    }
+}
+
+<div class="container py-5 mt-3">
+    <div class="row">
+        <div class="col-12 mb-4 text-center text-md-start">
+            <h2 class="fw-extrabold text-dark mb-1">Cài đặt tài khoản</h2>
+            <p class="text-secondary">Quản lý thông tin bảo mật và hồ sơ cá nhân của bạn tại FastLoan</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Cột Menu điều hướng bên trái -->
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-body p-2">
+                    <partial name="_ManageNav" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột Nội dung chính bên phải -->
+        <div class="col-lg-9">
+            <div class="card border-0 shadow-sm rounded-4" style="min-height: 450px;">
+                <div class="card-body p-4 p-md-5">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

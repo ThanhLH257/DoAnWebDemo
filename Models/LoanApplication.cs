@@ -41,5 +41,7 @@ namespace DoAnWebDemo.Models
         public string Status { get; set; } = "Pending";
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        public ICollection<RepaymentSchedule>? RepaymentSchedules { get; set; }
     }
 }

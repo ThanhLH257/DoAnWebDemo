@@ -1,0 +1,66 @@
+﻿@model DoAnWebDemo.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "Hồ sơ eKYC";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-person-badge"></i> Hồ Sơ Của Tôi (eKYC)</h4>
+                </div>
+                <div class="card-body">
+
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">@TempData["Success"]</div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Error"]</div>
+                    }
+
+                    <ul class="list-group mb-4">
+                        <li class="list-group-item"><strong>Họ và tên:</strong> @Model.FullName</li>
+                        <li class="list-group-item"><strong>Email:</strong> @Model.Email</li>
+                        <li class="list-group-item"><strong>Số CCCD:</strong> @Model.CCCD</li>
+                        <li class="list-group-item">
+                            <strong>Trạng thái:</strong>
+                            @if (Model.IsKycVerified)
+                            {
+                                <span class="badge bg-success">Đã xác thực</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">Chưa xác thực</span>
+                            }
+                        </li>
+                    </ul>
+
+                    <h5 class="text-secondary mb-3">Tải lên ảnh CCCD mặt trước</h5>
+
+                    <!-- Bắt buộc phải có enctype="multipart/form-data" -->
+                    <form asp-action="UploadCCCD" asp-controller="Profile" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <input type="file" name="cccdImage" class="form-control" accept="image/*" required />
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-cloud-upload"></i> Tải Ảnh Lên
+                        </button>
+                    </form>
+
+                    <!-- Hiển thị ảnh nếu đã upload -->
+                    @if (!string.IsNullOrEmpty(Model.CccdFrontImage))
+                    {
+                        <div class="mt-4 text-center">
+                            <p class="text-muted">Ảnh hiện tại:</p>
+                            <img src="@Model.CccdFrontImage" alt="CCCD" class="img-fluid rounded border shadow-sm" style="max-height: 200px; object-fit: cover;" />
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,65 @@
+﻿@inject SignInManager<ApplicationUser> SignInManager
+@{
+    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+}
+<ul class="nav nav-pills flex-column gap-1 custom-manage-nav">
+    <li class="nav-item">
+        <a class="nav-link @ManageNavPages.IndexNavClass(ViewContext) rounded-3 px-4 py-3 fw-semibold" id="profile" asp-page="./Index">
+            <i class="bi bi-person-circle me-2"></i> Hồ sơ cá nhân
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @ManageNavPages.EmailNavClass(ViewContext) rounded-3 px-4 py-3 fw-semibold" id="email" asp-page="./Email">
+            <i class="bi bi-envelope-at me-2"></i> Thay đổi Email
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext) rounded-3 px-4 py-3 fw-semibold" id="change-password" asp-page="./ChangePassword">
+            <i class="bi bi-shield-lock me-2"></i> Mật khẩu
+        </a>
+    </li>
+    @if (hasExternalLogins)
+    {
+        <li id="external-logins" class="nav-item">
+            <a id="external-login" class="nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext) rounded-3 px-4 py-3 fw-semibold" asp-page="./ExternalLogins">
+                <i class="bi bi-google me-2"></i> Tài khoản liên kết
+            </a>
+        </li>
+    }
+    <li class="nav-item">
+        <a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext) rounded-3 px-4 py-3 fw-semibold" id="two-factor" asp-page="./TwoFactorAuthentication">
+            <i class="bi bi-patch-check me-2"></i> Bảo mật 2 lớp
+        </a>
+    </li>
+    <li class="nav-item border-top mt-2 pt-2">
+        <a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext) text-danger rounded-3 px-4 py-3 fw-semibold" id="personal-data" asp-page="./PersonalData">
+            <i class="bi bi-trash3 me-2"></i> Dữ liệu cá nhân & Xóa
+        </a>
+    </li>
+</ul>
+
+<style>
+    .custom-manage-nav .nav-link {
+        color: #495057;
+        transition: all 0.2s ease;
+    }
+
+        .custom-manage-nav .nav-link:hover {
+            background-color: #f8f9fa;
+            color: #0d6efd;
+        }
+
+        .custom-manage-nav .nav-link.active {
+            background-color: #0d6efd !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
+        }
+
+        .custom-manage-nav .nav-link.text-danger:hover {
+            background-color: #fff5f5;
+        }
+
+        .custom-manage-nav .nav-link.text-danger.active {
+            background-color: #dc3545 !important;
+        }
+</style>

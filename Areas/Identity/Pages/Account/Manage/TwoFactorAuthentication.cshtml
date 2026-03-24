@@ -1,0 +1,109 @@
+﻿@page
+@using Microsoft.AspNetCore.Http.Features
+@model TwoFactorAuthenticationModel
+@{
+    ViewData["Title"] = "Bảo mật 2 lớp (2FA)";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<h4 class="fw-bold text-dark mb-4 text-uppercase" style="letter-spacing: 1px;">
+    <i class="bi bi-shield-lock-fill text-primary me-2"></i> @ViewData["Title"]
+</h4>
+
+<partial name="_StatusMessage" for="StatusMessage" />
+
+<div class="row">
+    <div class="col-md-10 col-lg-8">
+        @{
+            var consentFeature = HttpContext.Features.Get<ITrackingConsentFeature>();
+            @if (consentFeature?.CanTrack ?? true)
+            {
+                @if (Model.Is2faEnabled)
+                {
+                    <div class="alert alert-success rounded-4 border-0 shadow-sm d-flex align-items-center p-4 mb-4">
+                        <i class="bi bi-check-shield-fill fs-2 me-3"></i>
+                        <div>
+                            <h6 class="fw-bold mb-1">TRẠNG THÁI: ĐÃ BẬT</h6>
+                            <p class="mb-0 small opacity-75">Tài khoản của bạn đang được bảo vệ bởi lớp bảo mật thứ hai.</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2 mb-5">
+                        <a asp-page="./Disable2fa" class="btn btn-outline-danger rounded-pill px-4 fw-bold shadow-sm">Tắt bảo mật 2FA</a>
+                        <a asp-page="./GenerateRecoveryCodes" class="btn btn-outline-warning text-dark rounded-pill px-4 fw-bold shadow-sm">Làm mới mã khôi phục</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="bg-light p-4 p-md-5 rounded-4 border border-white shadow-sm mb-4 text-center">
+                        <div class="mb-4">
+                            <i class="bi bi-shield-slash text-muted" style="font-size: 4rem;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3">Tăng cường bảo mật cho ví tiền của bạn</h5>
+                        <p class="text-secondary mb-5 px-md-5">
+                            Bảo mật 2 lớp (2FA) giúp ngăn chặn các truy cập trái phép ngay cả khi kẻ xấu biết mật khẩu của bạn. Chúng tôi khuyến khích bạn kích hoạt ngay.
+                        </p>
+
+                        <a asp-page="./EnableAuthenticator" class="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-bold shadow-sm transition-all hover-lift">
+                            <i class="bi bi-qr-code-scan me-2"></i> CÀI ĐẶT ỨNG DỤNG XÁC THỰC
+                        </a>
+                    </div>
+                }
+
+                <div class="mt-4 pt-4 border-top">
+                    <h6 class="fw-bold text-dark mb-3">Ứng dụng khuyên dùng:</h6>
+                    <div class="d-flex gap-5">
+                        <!-- Google Authenticator SVG -->
+                        <div class="text-center">
+                            <div class="mb-2" style="width: 45px; height: 45px; margin: 0 auto;">
+                                <svg viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M110.1 27l-1.9 4.1c-1.3 2.7-3.9 4.4-6.9 4.4H68.7c-3 0-5.6-1.7-6.9-4.4L59.9 27H40v26h112V27h-41.9z" fill="#4285F4" />
+                                    <path d="M40 53h112v112H40V53z" fill="#FBBC05" />
+                                    <path d="M40 53h112v23H40V53z" fill="#EA4335" />
+                                    <path d="M40 142h112v23H40v-23z" fill="#34A853" />
+                                    <path d="M96 128a32 32 0 100-64 32 32 0 000 64z" fill="#FFF" />
+                                    <path d="M104 96h-8V80h-1v16h-7v1h7v16h1v-16h8v-1z" fill="#4285F4" />
+                                </svg>
+                            </div>
+                            <p class="small text-muted mb-0 fw-medium">Google Auth</p>
+                        </div>
+
+                        <!-- Microsoft Authenticator SVG -->
+                        <div class="text-center">
+                            <div class="mb-2" style="width: 45px; height: 45px; margin: 0 auto;">
+                                <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M24 4L6 12v10c0 11.1 7.7 21.5 18 24 10.3-2.5 18-12.9 18-24V12L24 4z" fill="#0078D4" />
+                                    <path d="M24 14l-8 8h5v12h6V22h5l-8-8z" fill="#FFF" />
+                                </svg>
+                            </div>
+                            <p class="small text-muted mb-0 fw-medium">Microsoft Auth</p>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger rounded-4 border-0 shadow-sm p-4">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>Chính sách Cookie chưa được chấp nhận.</strong>
+                    <p class="mb-0 mt-2">Bạn phải chấp nhận chính sách Cookie trước khi có thể kích hoạt bảo mật 2 lớp.</p>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<style>
+    .hover-lift:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(13, 110, 253, 0.15) !important;
+    }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

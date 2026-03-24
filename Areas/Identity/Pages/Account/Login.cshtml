@@ -1,0 +1,110 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+
+<div class="container py-5 mt-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-10">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="row g-0">
+
+                    <!-- CỘT TRÁI: FORM ĐĂNG NHẬP -->
+                    <div class="col-lg-6 p-4 p-md-5 bg-white d-flex flex-column justify-content-center">
+                        <div class="text-center mb-4 d-lg-none">
+                            <h2 class="fw-extrabold text-primary"><i class="bi bi-bank2 text-warning"></i> FastLoan</h2>
+                        </div>
+
+                        <h3 class="fw-bold mb-1" style="color: #e53935;">ĐĂNG NHẬP</h3>
+                        <p class="text-muted mb-4 fs-6">Nhanh chóng, dễ dàng</p>
+
+                        <form id="account" method="post">
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Email" class="form-control rounded-3" autocomplete="username" aria-required="true" placeholder="Email" />
+                                <label asp-for="Input.Email">Email <span class="text-danger">*</span></label>
+                                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Password" class="form-control rounded-3" autocomplete="current-password" aria-required="true" placeholder="Mật khẩu" />
+                                <label asp-for="Input.Password">Mật khẩu <span class="text-danger">*</span></label>
+                                <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" asp-for="Input.RememberMe" />
+                                    <label class="form-check-label text-muted small fw-medium" asp-for="Input.RememberMe">
+                                        Ghi nhớ đăng nhập
+                                    </label>
+                                </div>
+                                <a id="forgot-password" asp-page="./ForgotPassword" class="text-primary text-decoration-none small fw-bold">
+                                    Quên mật khẩu?
+                                </a>
+                            </div>
+
+                            <button id="login-submit" type="submit" class="btn btn-danger w-100 py-3 rounded-3 fw-bold mb-3 shadow-sm" style="background-color: #e53935; border: none; font-size: 1.1rem;">
+                                ĐĂNG NHẬP
+                            </button>
+                        </form>
+
+                        <div class="text-center mb-3 position-relative">
+                            <hr class="text-muted my-3">
+                            <span class="bg-white px-3 text-dark fw-bold position-absolute top-50 start-50 translate-middle small">Hoặc</span>
+                        </div>
+
+                        <!-- Form gọi chức năng đăng nhập Google (SSO) -->
+                        <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                            <button type="submit" name="provider" value="Google" class="btn btn-outline-dark w-100 py-2 rounded-3 mb-3 d-flex justify-content-center align-items-center fw-semibold small" formnovalidate>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" style="width: 18px; height: 18px; margin-right: 10px;">
+                                Tiếp tục với Google
+                            </button>
+                        </form>
+
+                        <div class="text-center mt-2 pt-3 border-top">
+                            <p class="mb-0 text-muted small">Chưa có tài khoản? <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-primary text-decoration-none fw-bold">Đăng ký</a></p>
+                        </div>
+                    </div>
+
+                    <!-- CỘT PHẢI: HÌNH ẢNH MINH HỌA VÀ GIỚI THIỆU -->
+                    <div class="col-lg-6 d-none d-lg-flex flex-column align-items-center justify-content-center p-5 text-center position-relative" style="background-color: #1a233a; overflow: hidden;">
+
+                        <!-- Cụm Icon trang trí (Mô phỏng hình ảnh thiết kế) -->
+                        <div class="mb-5 position-relative" style="z-index: 2;">
+                            <div class="bg-danger text-white rounded-4 d-flex align-items-center justify-content-center shadow-lg" style="width: 100px; height: 80px; margin: 0 auto; transform: rotate(-5deg);">
+                                <i class="bi bi-briefcase-fill" style="font-size: 3rem;"></i>
+                            </div>
+                            <!-- Các icon bay xung quanh -->
+                            <i class="bi bi-shield-check text-primary position-absolute" style="font-size: 2.5rem; top: -30px; left: -50px; transform: rotate(-15deg);"></i>
+                            <i class="bi bi-coin text-warning position-absolute" style="font-size: 2rem; top: -10px; right: -60px; transform: rotate(15deg);"></i>
+                            <i class="bi bi-piggy-bank text-info position-absolute" style="font-size: 3rem; bottom: -20px; right: -70px; transform: rotate(-10deg);"></i>
+                            <i class="bi bi-bank2 text-light position-absolute" style="font-size: 2.5rem; bottom: -20px; left: -60px; transform: rotate(10deg);"></i>
+                            <i class="bi bi-graph-up-arrow text-success position-absolute" style="font-size: 2rem; top: 30px; left: -80px;"></i>
+                        </div>
+
+                        <!-- Đoạn Text Giới thiệu -->
+                        <div style="z-index: 2;">
+                            <h4 class="text-white fw-bold mb-3"><i class="bi bi-bank2 text-warning"></i> FastLoan VN</h4>
+                            <p class="text-white-50 lh-lg px-4" style="font-size: 0.95rem;">
+                                Giải pháp Tài Chính giúp bạn kết nối và lựa chọn sản phẩm tài chính như ngân hàng, thẻ tín dụng, khoản vay,... Ngoài ra, FastLoan còn cung cấp các phương pháp quản lý tài chính cá nhân đơn giản, hữu ích giúp bạn làm chủ tài chính.
+                            </p>
+                        </div>
+
+                        <!-- Hiệu ứng vệt sáng nền -->
+                        <div class="position-absolute rounded-circle bg-primary opacity-25" style="width: 350px; height: 350px; top: -100px; right: -100px; filter: blur(60px); z-index: 1;"></div>
+                        <div class="position-absolute rounded-circle bg-danger opacity-25" style="width: 300px; height: 300px; bottom: -100px; left: -50px; filter: blur(60px); z-index: 1;"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

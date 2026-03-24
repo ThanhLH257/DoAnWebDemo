@@ -1,0 +1,93 @@
+﻿@model IEnumerable<DoAnWebDemo.Models.LoanApplication>
+
+@{
+    ViewData["Title"] = "Lịch Trả Nợ Của Tôi";
+}
+
+@if (ViewBag.Notification != null)
+{
+    <div class="alert alert-danger fw-bold alert-dismissible fade show"> <i class="bi bi-bell-fill"></i> @ViewBag.Notification </div>
+}
+
+<div class="container mt-4">
+    <h2 class="text-success mb-4"><i class="bi bi-calendar-check"></i> Lịch Trả Nợ Của Tôi</h2>
+
+    <!-- Hiển thị thông báo khi thanh toán thành công -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success fw-bold shadow-sm">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">Bạn chưa có khoản vay nào đang hoạt động.</div>
+    }
+
+    @foreach (var loan in Model)
+    {
+        <div class="card mb-5 shadow-sm border-0">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    Khoản vay: @loan.Package?.PackageName -
+                    Tổng tiền: @loan.LoanAmount.ToString("#,##0") VNĐ
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Kỳ thứ</th>
+                                <th>Hạn thanh toán</th>
+                                <th>Tiền gốc</th>
+                                <th>Tiền lãi</th>
+                                <th>Tổng phải trả</th>
+                                <th>Trạng thái</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Sắp xếp các kỳ theo thứ tự 1,2,3... -->
+                            @foreach (var item in loan.RepaymentSchedules.OrderBy(s => s.InstallmentNumber))
+                            {
+                                <tr>
+                                    <td class="fw-bold text-center">@item.InstallmentNumber</td>
+                                    <td>@item.DueDate.ToString("dd/MM/yyyy")</td>
+                                    <td>@item.PrincipalAmount.ToString("#,##0")</td>
+                                    <td>@item.InterestAmount.ToString("#,##0")</td>
+                                    <td><strong class="text-danger">@item.TotalAmount.ToString("#,##0") VNĐ</strong></td>
+                                    <td>
+                                        @if (item.IsPaid)
+                                        {
+                                            <span class="badge bg-success">Đã thanh toán</span>
+                                
+                                            <br />
+                                            <small class="text-muted">Ngày: @item.PaidDate?.ToString("dd/MM/yyyy")</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning text-dark">Chưa thanh toán</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (!item.IsPaid)
+                                        {
+                                            <form asp-controller="Payment" asp-action="PayInstallment" asp-route-id="@item.Id" method="post">
+                                                <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3"
+                                                        onclick="return confirm('Xác nhận thanh toán @item.TotalAmount.ToString("#,##0") VNĐ cho kỳ này?');">
+                                                    Thanh toán ngay
+                                                </button>
+                                            </form>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
