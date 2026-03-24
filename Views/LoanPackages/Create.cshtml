@@ -1,54 +1,86 @@
 ﻿@model DoAnWebDemo.Models.LoanPackage
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Tạo Gói Vay Mới";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Create</h1>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-primary py-4 text-center">
+                    <h3 class="fw-bold text-white mb-0"><i class="bi bi-plus-square-fill me-2"></i> @ViewData["Title"]</h3>
+                    <p class="text-white-50 mb-0 small text-uppercase" style="letter-spacing: 1px;">Thiết lập sản phẩm tài chính mới cho hệ thống</p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 border-0 mb-4" role="alert"></div>
 
-<h4>LoanPackage</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="PackageName" class="control-label"></label>
-                <input asp-for="PackageName" class="form-control" />
-                <span asp-validation-for="PackageName" class="text-danger"></span>
+                        <div class="row g-4">
+                            <!-- Tên gói vay -->
+                            <div class="col-12">
+                                <div class="form-floating shadow-sm">
+                                    <input asp-for="PackageName" class="form-control rounded-3 border-0 bg-light" placeholder="Tên gói vay" />
+                                    <label asp-for="PackageName" class="fw-bold text-secondary">Tên sản phẩm gói vay</label>
+                                </div>
+                                <span asp-validation-for="PackageName" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Lãi suất -->
+                            <div class="col-md-6">
+                                <div class="form-floating shadow-sm">
+                                    <input asp-for="InterestRate" class="form-control rounded-3 border-0 bg-light" placeholder="1.5" />
+                                    <label asp-for="InterestRate" class="fw-bold text-secondary">Lãi suất (% / tháng)</label>
+                                </div>
+                                <span asp-validation-for="InterestRate" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Kỳ hạn mặc định -->
+                            <div class="col-md-6">
+                                <div class="form-floating shadow-sm">
+                                    <input asp-for="DefaultTermMonths" class="form-control rounded-3 border-0 bg-light" placeholder="12" />
+                                    <label asp-for="DefaultTermMonths" class="fw-bold text-secondary">Kỳ hạn mặc định (Tháng)</label>
+                                </div>
+                                <span asp-validation-for="DefaultTermMonths" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Hạn mức tối thiểu -->
+                            <div class="col-md-6">
+                                <div class="form-floating shadow-sm">
+                                    <input asp-for="MinAmount" class="form-control rounded-3 border-0 bg-light" placeholder="1,000,000" />
+                                    <label asp-for="MinAmount" class="fw-bold text-secondary">Hạn mức tối thiểu (VNĐ)</label>
+                                </div>
+                                <span asp-validation-for="MinAmount" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Hạn mức tối đa -->
+                            <div class="col-md-6">
+                                <div class="form-floating shadow-sm">
+                                    <input asp-for="MaxAmount" class="form-control rounded-3 border-0 bg-light" placeholder="100,000,000" />
+                                    <label asp-for="MaxAmount" class="fw-bold text-secondary">Hạn mức tối đa (VNĐ)</label>
+                                </div>
+                                <span asp-validation-for="MaxAmount" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 d-grid gap-3">
+                            <button type="submit" class="btn btn-primary btn-lg py-3 rounded-pill fw-bold shadow-sm hover-lift">
+                                <i class="bi bi-check-circle-fill me-2"></i> LƯU GÓI VAY
+                            </button>
+                            <a asp-action="Index" class="btn btn-link text-secondary text-decoration-none text-center">
+                                <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="InterestRate" class="control-label"></label>
-                <input asp-for="InterestRate" class="form-control" />
-                <span asp-validation-for="InterestRate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MinAmount" class="control-label"></label>
-                <input asp-for="MinAmount" class="form-control" />
-                <span asp-validation-for="MinAmount" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MaxAmount" class="control-label"></label>
-                <input asp-for="MaxAmount" class="form-control" />
-                <span asp-validation-for="MaxAmount" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DefaultTermMonths" class="control-label"></label>
-                <input asp-for="DefaultTermMonths" class="form-control" />
-                <span asp-validation-for="DefaultTermMonths" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

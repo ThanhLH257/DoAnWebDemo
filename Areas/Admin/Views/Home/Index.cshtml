@@ -1,83 +1,228 @@
-﻿@{
-    ViewData["Title"] = "Dashboard Thống Kê";
-    Layout = "~/Views/Shared/_Layout.cshtml"; // Dùng chung layout
+﻿@model IEnumerable<DoAnWebDemo.Models.LoanApplication>
+@{
+    ViewData["Title"] = "Bảng Điều Khiển Quản Trị";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Tải thư viện vẽ biểu đồ -->
-<script src="[https://cdn.jsdelivr.net/npm/chart.js](https://cdn.jsdelivr.net/npm/chart.js)"></script>
+<div class="container-fluid py-4 px-4 bg-light min-vh-100">
+    <!-- Header Chào mừng -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h2 class="fw-extrabold text-dark m-0">Hệ Thống FastLoan VN</h2>
+            <p class="text-secondary">Xin chào Admin, đây là báo cáo vận hành hôm nay.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-white shadow-sm border rounded-3 px-3 py-2 fw-bold text-secondary">
+                <i class="bi bi-calendar3 me-2"></i> @DateTime.Now.ToString("dd/MM/yyyy")
+            </button>
+            <button class="btn btn-primary shadow-sm rounded-3 px-3 py-2 fw-bold" onclick="window.location.reload();">
+                <i class="bi bi-arrow-clockwise me-2"></i> Làm mới
+            </button>
+        </div>
+    </div>
 
-<div class="container mt-4">
-    <h2 class="text-primary fw-bold mb-4"><i class="bi bi-speedometer2"></i> Tổng Quan Hệ Thống</h2>
-
-    <!-- 3 Thẻ Thống kê Cốt lõi -->
-    <div class="row mb-5">
-        <div class="col-md-4">
-            <div class="card bg-info text-white shadow">
-                <div class="card-body">
-                    <h5 class="card-title">Tổng Khách Hàng</h5>
-                    <h2 class="display-5 fw-bold">@ViewBag.TotalUsers</h2>
+    <!-- 4 Thẻ Thống kê Top Widgets -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 stat-card overflow-hidden" style="background: linear-gradient(45deg, #4e73df, #224abe);">
+                <div class="card-body p-4 position-relative">
+                    <div class="text-white-50 small fw-bold text-uppercase mb-1">Tổng Khách Hàng</div>
+                    <div class="h2 mb-0 fw-extrabold text-white">@ViewBag.TotalUsers</div>
+                    <i class="bi bi-people-fill position-absolute end-0 bottom-0 p-3 opacity-25" style="font-size: 4rem;"></i>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card bg-warning text-dark shadow">
-                <div class="card-body">
-                    <h5 class="card-title">Tổng Đơn Vay</h5>
-                    <h2 class="display-5 fw-bold">@ViewBag.TotalLoanApps</h2>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 stat-card overflow-hidden" style="background: linear-gradient(45deg, #1cc88a, #13855c);">
+                <div class="card-body p-4 position-relative">
+                    <div class="text-white-50 small fw-bold text-uppercase mb-1">Đã Giải Ngân</div>
+                    <div class="h2 mb-0 fw-extrabold text-white">@ViewBag.TotalDisbursed.ToString("#,##0") đ</div>
+                    <i class="bi bi-cash-stack position-absolute end-0 bottom-0 p-3 opacity-25" style="font-size: 4rem;"></i>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card bg-success text-white shadow">
-                <div class="card-body">
-                    <h5 class="card-title">Tổng Tiền Giải Ngân</h5>
-                    <h2 class="display-5 fw-bold">@ViewBag.TotalDisbursed.ToString("#,##0") đ</h2>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 stat-card overflow-hidden" style="background: linear-gradient(45deg, #f6c23e, #dda20a);">
+                <div class="card-body p-4 position-relative">
+                    <div class="text-white-50 small fw-bold text-uppercase mb-1">Đơn Chờ Duyệt</div>
+                    <div class="h2 mb-0 fw-extrabold text-white">@ViewBag.PendingCount</div>
+                    <i class="bi bi-file-earmark-text position-absolute end-0 bottom-0 p-3 opacity-25" style="font-size: 4rem;"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 stat-card overflow-hidden" style="background: linear-gradient(45deg, #36b9cc, #258391);">
+                <div class="card-body p-4 position-relative">
+                    <div class="text-white-50 small fw-bold text-uppercase mb-1">Lợi Nhuận Dự Kiến</div>
+                    <div class="h2 mb-0 fw-extrabold text-white">@ViewBag.TotalInterest.ToString("#,##0") đ</div>
+                    <i class="bi bi-graph-up-arrow position-absolute end-0 bottom-0 p-3 opacity-25" style="font-size: 4rem;"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Khu vực Vẽ Biểu Đồ -->
-    <div class="row">
-        <div class="col-md-6 offset-md-3">
-            <div class="card shadow">
-                <div class="card-header bg-white">
-                    <h5 class="text-center mb-0">Biểu Đồ Trạng Thái Đơn Vay</h5>
+    <!-- Khu vực Biểu đồ -->
+    <div class="row g-4 mb-5">
+        <!-- Biểu đồ cột: Độ phổ biến gói vay -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-white border-0 py-4 px-4 d-flex align-items-center">
+                    <h5 class="m-0 fw-bold text-dark"><i class="bi bi-bar-chart-fill text-primary me-2"></i> Phân Tích Gói Vay</h5>
                 </div>
-                <div class="card-body">
-                    <!-- Thẻ canvas để vẽ biểu đồ -->
-                    <canvas id="loanStatusChart"></canvas>
+                <div class="card-body px-4 pb-4">
+                    <canvas id="barChart" style="max-height: 350px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- Biểu đồ tròn: Trạng thái đơn -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-white border-0 py-4 px-4">
+                    <h5 class="m-0 fw-bold text-dark"><i class="bi bi-pie-chart-fill text-danger me-2"></i> Tỷ Lệ Đơn Vay</h5>
+                </div>
+                <div class="card-body px-4 pb-4 text-center">
+                    <canvas id="pieChart" style="max-height: 280px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bảng Đơn vay mới nhất & Hành động nhanh -->
+    <div class="row g-4">
+        <div class="col-lg-9">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white border-0 py-4 px-4 d-flex justify-content-between align-items-center">
+                    <h5 class="m-0 fw-bold text-dark"><i class="bi bi-list-stars text-warning me-2"></i> Đơn Vay Mới Nhất</h5>
+                    <a asp-controller="LoanApprove" asp-action="Index" class="btn btn-sm btn-outline-primary fw-bold rounded-pill">Xem tất cả</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light text-secondary">
+                                <tr>
+                                    <th class="border-0 ps-4 py-3">Khách Hàng</th>
+                                    <th class="border-0 py-3">Gói Vay</th>
+                                    <th class="border-0 py-3">Số Tiền</th>
+                                    <th class="border-0 py-3">Trạng Thái</th>
+                                    <th class="border-0 pe-4 py-3 text-end">Chi Tiết</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td class="ps-4">
+                                            <div class="fw-bold">@item.User?.FullName</div>
+                                            <small class="text-muted">@item.User?.Email</small>
+                                        </td>
+                                        <td>@item.Package?.PackageName</td>
+                                        <td class="fw-bold">@item.LoanAmount.ToString("#,##0") đ</td>
+                                        <td>
+                                            @if (item.Status == "Pending")
+                                            {
+                                                <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill">Chờ duyệt</span>
+                                            }
+                                            else if (item.Status == "Approved" || item.Status == "Active")
+                                            {
+
+                                                <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">Đã duyệt</span>
+                                            }
+                                            else
+                                            {
+
+                                                <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill">Từ chối</span>
+                                            }
+                                        </td>
+                                        <td class="pe-4 text-end">
+                                            <a asp-controller="LoanApprove" asp-action="Index" class="btn btn-light btn-sm rounded-circle"><i class="bi bi-chevron-right"></i></a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Cột hành động nhanh -->
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-white p-4">
+                <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-lightning-fill text-warning me-2"></i> Lối Tắt</h5>
+                <div class="d-grid gap-3">
+                    <a asp-area="" asp-controller="LoanPackages" asp-action="Create" class="btn btn-outline-primary py-3 rounded-4 text-start fw-bold hover-lift border-light shadow-sm">
+                        <i class="bi bi-plus-circle-fill me-2 fs-5"></i> Tạo gói vay mới
+                    </a>
+                    <a asp-controller="LoanApprove" asp-action="Index" class="btn btn-outline-success py-3 rounded-4 text-start shadow-sm border-light">
+                        <i class="bi bi-cash-coin me-2"></i> Giải ngân tiền
+                    </a>
+                    <form asp-controller="LoanApprove" asp-action="ApplyPenalty" method="post" class="d-grid">
+                        <button type="submit" class="btn btn-outline-danger py-3 rounded-4 text-start shadow-sm border-light" onclick="return confirm('Quét phạt toàn hệ thống?');">
+                            <i class="bi bi-shield-exclamation me-2"></i> Quét phạt nợ xấu
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Script để kích hoạt biểu đồ -->
+<!-- Scripts vẽ biểu đồ với cấu hình đẹp -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        var ctx = document.getElementById('loanStatusChart').getContext('2d');
-        var loanStatusChart = new Chart(ctx, {
-            type: 'pie', // Loại biểu đồ: Hình tròn (Pie)
+        // 1. BIỂU ĐỒ TRÒN (TRẠNG THÁI)
+        new Chart(document.getElementById('pieChart'), {
+            type: 'doughnut', // Kiểu vòng tròn rỗng (hiện đại hơn)
             data: {
-                // Nhận dữ liệu từ Controller (ViewBag)
-                labels: ['Chờ duyệt (Pending)', 'Đã duyệt (Approved)', 'Từ chối (Rejected)'],
+                labels: ['Đang chờ', 'Hoàn tất', 'Từ chối'],
                 datasets: [{
                     data: [@ViewBag.PendingCount, @ViewBag.ApprovedCount, @ViewBag.RejectedCount],
-                    backgroundColor: [
-                        '#ffc107', // Vàng
-                        '#198754', // Xanh lá
-                        '#dc3545'  // Đỏ
-                    ],
-                    borderWidth: 1
+                    backgroundColor: ['#f6c23e', '#1cc88a', '#e74a3b'],
+                    hoverOffset: 15,
+                    borderWidth: 0
                 }]
             },
             options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'bottom' }
-                }
+                plugins: { legend: { position: 'bottom' }, cutout: '70%' }
+            }
+        });
+
+        // 2. BIỂU ĐỒ CỘT (GÓI VAY)
+        new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(ViewBag.PackageLabels)),
+                datasets: [{
+                    label: 'Số lượng đơn đăng ký',
+                    data: @Html.Raw(Json.Serialize(ViewBag.PackageData)),
+                    backgroundColor: 'rgba(78, 115, 223, 0.8)',
+                    borderRadius: 8,
+                    barThickness: 40
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } },
+                plugins: { legend: { display: false } }
             }
         });
     });
 </script>
+
+<style>
+    .stat-card {
+        transition: all 0.3s ease;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0,0,0,0.15) !important;
+        }
+
+    .btn-white:hover {
+        background-color: #f8f9fa;
+    }
+
+    .fw-extrabold {
+        font-weight: 800;
+    }
+</style>

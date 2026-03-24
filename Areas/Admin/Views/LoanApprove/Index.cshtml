@@ -5,99 +5,210 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary m-0"><i class="bi bi-file-earmark-check"></i> Phê duyệt & Giải ngân</h2>
+<div class="container-fluid py-4 px-lg-5 min-vh-100 bg-light-soft">
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+        <div>
+            <h3 class="fw-black text-dark mb-1 text-uppercase" style="letter-spacing: 1px;">
+                <i class="bi bi-file-earmark-check text-primary me-2"></i> PHÊ DUYỆT & GIẢI NGÂN
+            </h3>
+            <p class="text-secondary mb-0 small">Quản lý, xét duyệt và cấp phát vốn cho khách hàng</p>
+        </div>
 
         <!-- Nút Quét Phạt Trễ Hạn (F11) -->
         <form asp-area="Admin" asp-controller="LoanApprove" asp-action="ApplyPenalty" method="post">
-            <button type="submit" class="btn btn-danger btn-lg fw-bold shadow-sm" onclick="return confirm('Hệ thống sẽ quét và cộng 50.000đ vào các kỳ trễ hạn. Bạn chắc chứ?');">
-                <i class="bi bi-exclamation-triangle-fill"></i> QUÉT PHẠT TRỄ HẠN
+            <button type="submit" class="btn btn-danger py-2 px-4 rounded-pill fw-bold shadow-sm hover-lift transition-all" onclick="return confirm('Hệ thống sẽ quét và cộng 50.000đ vào các kỳ trễ hạn. Bạn chắc chắn chứ?');">
+                <i class="bi bi-shield-exclamation me-1"></i> QUÉT PHẠT TRỄ HẠN
             </button>
         </form>
     </div>
 
-    <!-- Hiển thị thông báo khi Giải ngân hoặc Phạt thành công -->
+    <!-- Thông báo -->
     @if (TempData["Message"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show shadow-sm fw-bold" role="alert">
-            <i class="bi bi-check-circle-fill"></i> @TempData["Message"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="alert alert-success border-0 shadow-sm rounded-4 p-4 mb-4 d-flex align-items-center animate-fade-in" role="alert">
+            <div class="bg-success bg-opacity-10 p-2 rounded-circle me-3 text-success">
+                <i class="bi bi-check-circle-fill fs-4"></i>
+            </div>
+            <span class="fw-bold text-dark">@TempData["Message"]</span>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    <div class="table-responsive shadow-sm rounded">
-        <table class="table table-bordered table-hover align-middle mb-0">
-            <thead class="table-dark">
-                <tr>
-                    <th>Khách hàng</th>
-                    <th>Liên hệ / CCCD</th>
-                    <th>Gói vay</th>
-                    <th>Số tiền / Điểm TD</th>
-                    <th>Kỳ hạn</th>
-                    <th>Trạng thái</th>
-                    <th>Hành động</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white">
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td><strong class="text-primary">@item.User?.FullName</strong></td>
-                        <td>
-                            @item.User?.PhoneNumber <br />
-                            <small class="text-muted">CCCD: @item.User?.CCCD</small>
-                        </td>
-                        <td>@item.Package?.PackageName</td>
-                        <td>
-                            <strong class="text-danger">@item.LoanAmount.ToString("#,##0") đ</strong><br />
-                            <span class="badge bg-info text-dark">Điểm TD: @item.CreditScore</span>
-                        </td>
-                        <td>@item.TermMonths tháng</td>
-                        <td>
-                            @if (item.Status == "Pending")
-                            {
-                                <span class="badge bg-warning text-dark">Chờ duyệt</span>
-                            }
-                            else if (item.Status == "Approved")
-                            {
-                                <span class="badge bg-primary">Chờ giải ngân</span>
-                            }
-                            else if (item.Status == "Active")
-                            {
-                                <span class="badge bg-success">Đang hoạt động</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">@item.Status</span>
-                            }
-                        </td>
-                        <td>
-                            <div class="d-flex gap-2">
-                                @if (item.Status == "Pending")
-                                {
-                                    <!-- Trạng thái Chờ duyệt: Hiển thị nút Duyệt / Từ chối -->
-                                    <form asp-area="Admin" asp-controller="LoanApprove" asp-action="Approve" asp-route-id="@item.Id" method="post">
-                                        <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check-lg"></i> Duyệt</button>
-                                    </form>
-                                    <form asp-area="Admin" asp-controller="LoanApprove" asp-action="Reject" asp-route-id="@item.Id" method="post">
-                                        <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Bạn chắc chắn muốn từ chối đơn này?');">Từ chối</button>
-                                    </form>
-                                }
-                                else if (item.Status == "Approved")
-                                {
-                                    <!-- Trạng thái Đã duyệt: Hiển thị nút Giải ngân (F8) -->
-                                    <form asp-area="Admin" asp-controller="LoanApprove" asp-action="Disburse" asp-route-id="@item.Id" method="post">
-                                        <button type="submit" class="btn btn-primary btn-sm fw-bold shadow-sm">
-                                            <i class="bi bi-cash-coin"></i> Giải ngân ngay
-                                        </button>
-                                    </form>
-                                }
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <!-- Table Card -->
+    <div class="card border-0 shadow-sm rounded-5 overflow-hidden bg-white">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 custom-table">
+                    <thead class="bg-light">
+                        <tr class="text-secondary x-small text-uppercase fw-bold">
+                            <th class="border-0 ps-4 py-4">Khách hàng</th>
+                            <th class="border-0 py-4">Gói vay</th>
+                            <th class="border-0 py-4">Hạn mức / Tín dụng</th>
+                            <th class="border-0 py-4">Kỳ hạn</th>
+                            <th class="border-0 py-4 text-center">Trạng thái</th>
+                            <th class="border-0 pe-4 py-4 text-end">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="opacity-50">
+                                        <i class="bi bi-inbox display-4 d-block mb-3 text-secondary"></i>
+                                        <p class="fw-medium text-muted mb-0">Chưa có đơn vay nào trong hệ thống.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        @foreach (var item in Model)
+                        {
+                            <tr class="transition-all">
+                                <!-- Khách hàng -->
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold me-3" style="width: 45px; height: 45px; font-size: 1.1rem;">
+                                            @(string.IsNullOrEmpty(item.User?.FullName) ? "U" : item.User.FullName.Substring(0, 1).ToUpper())
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark mb-1">@item.User?.FullName</div>
+                                            <div class="x-small text-muted">
+                                                <i class="bi bi-telephone-fill me-1"></i>@(item.User?.PhoneNumber ?? "N/A") &nbsp;|&nbsp;
+                                                <i class="bi bi-person-vcard me-1"></i>@(item.User?.CCCD ?? "N/A")
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Gói vay -->
+                                <td class="py-3">
+                                    <span class="badge bg-light text-dark border px-3 py-2 fw-semibold rounded-pill">
+                                        @item.Package?.PackageName
+                                    </span>
+                                </td>
+
+                                <!-- Số tiền / Điểm TD -->
+                                <td class="py-3">
+                                    <div class="fw-black text-danger mb-1" style="font-size: 1.1rem;">@item.LoanAmount.ToString("#,##0") đ</div>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <span class="badge @(item.CreditScore >= 600 ? "bg-success" : (item.CreditScore >= 400 ? "bg-warning" : "bg-danger")) bg-opacity-10 @(item.CreditScore >= 600 ? "text-success" : (item.CreditScore >= 400 ? "text-warning" : "text-danger")) rounded-pill px-2 py-1 x-small fw-bold border border-opacity-25">
+                                            Điểm AI: @item.CreditScore
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <!-- Kỳ hạn -->
+                                <td class="py-3">
+                                    <div class="fw-bold text-dark">@item.TermMonths <span class="fw-normal text-muted small">tháng</span></div>
+                                </td>
+
+                                <!-- Trạng thái -->
+                                <td class="py-3 text-center">
+                                    @if (item.Status == "Pending")
+                                    {
+                                        <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill fw-bold border border-warning border-opacity-25"><i class="bi bi-hourglass-split me-1"></i> Chờ duyệt</span>
+                                    }
+                                    else if (item.Status == "Approved")
+                                    {
+                                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-bold border border-primary border-opacity-25"><i class="bi bi-wallet2 me-1"></i> Chờ giải ngân</span>
+                                    }
+                                    else if (item.Status == "Active")
+                                    {
+                                        <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill fw-bold border border-success border-opacity-25"><i class="bi bi-check-circle-fill me-1"></i> Đang hoạt động</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill fw-bold border border-danger border-opacity-25"><i class="bi bi-x-circle-fill me-1"></i> Từ chối</span>
+                                    }
+                                </td>
+
+                                <!-- Hành động -->
+                                <td class="pe-4 py-3 text-end">
+                                    <div class="d-flex gap-2 justify-content-end align-items-center">
+                                        @if (item.Status == "Pending")
+                                        {
+                                            <form asp-area="Admin" asp-controller="LoanApprove" asp-action="Approve" asp-route-id="@item.Id" method="post">
+                                                <button type="submit" class="btn btn-success btn-sm rounded-pill px-3 fw-bold shadow-sm hover-lift"><i class="bi bi-check-lg me-1"></i> Duyệt</button>
+                                            </form>
+                                            <form asp-area="Admin" asp-controller="LoanApprove" asp-action="Reject" asp-route-id="@item.Id" method="post">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold hover-lift" onclick="return confirm('Bạn chắc chắn muốn từ chối đơn vay này?');"><i class="bi bi-x-lg me-1"></i> Từ chối</button>
+                                            </form>
+                                        }
+                                        else if (item.Status == "Approved")
+                                        {
+                                            <form asp-area="Admin" asp-controller="LoanApprove" asp-action="Disburse" asp-route-id="@item.Id" method="post">
+                                                <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm hover-lift">
+                                                    <i class="bi bi-cash-coin me-1"></i> Giải ngân
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted x-small italic fw-medium px-3">Đã xử lý</span>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
+
+<style>
+    :root {
+        --light-soft: #f4f7fc;
+    }
+
+    .bg-light-soft {
+        background-color: var(--light-soft);
+    }
+
+    .fw-black {
+        font-weight: 900;
+    }
+
+    .x-small {
+        font-size: 0.72rem;
+    }
+
+    .italic {
+        font-style: italic;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+    }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+
+    .custom-table tbody tr:hover {
+        background-color: #f8faff;
+    }
+
+    .custom-table th {
+        letter-spacing: 0.5px;
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.4s ease-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

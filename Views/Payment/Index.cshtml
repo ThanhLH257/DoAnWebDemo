@@ -1,83 +1,167 @@
 ﻿@model IEnumerable<DoAnWebDemo.Models.LoanApplication>
 
 @{
-    ViewData["Title"] = "Lịch Trả Nợ Của Tôi";
+    ViewData["Title"] = "Quản lý lịch trả nợ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@if (ViewBag.Notification != null)
-{
-    <div class="alert alert-danger fw-bold alert-dismissible fade show"> <i class="bi bi-bell-fill"></i> @ViewBag.Notification </div>
-}
+<div class="container py-5">
+    <!-- Header & Điều hướng -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+        <div>
+            <h2 class="fw-black text-dark mb-1 text-uppercase" style="letter-spacing: 1px;">Kế Hoạch Hoàn Trả</h2>
+            <p class="text-secondary mb-0">Theo dõi chi tiết các kỳ hạn và trạng thái thanh toán của bạn</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="/" class="btn btn-white shadow-sm border rounded-pill px-4 fw-bold small transition-all hover-lift">
+                <i class="bi bi-house me-2"></i> Trang chủ
+            </a>
+        </div>
+    </div>
 
-<div class="container mt-4">
-    <h2 class="text-success mb-4"><i class="bi bi-calendar-check"></i> Lịch Trả Nợ Của Tôi</h2>
+    <!-- Thông báo nhắc nợ (F10) -->
+    @if (ViewBag.Notification != null)
+    {
+        <div class="alert alert-danger border-0 shadow-sm rounded-4 p-4 mb-5 d-flex align-items-center animate-pulse">
+            <div class="bg-white bg-opacity-20 p-2 rounded-circle me-3">
+                <i class="bi bi-bell-fill fs-3"></i>
+            </div>
+            <div class="flex-grow-1">
+                <h6 class="fw-bold mb-1">CẢNH BÁO NHẮC NỢ</h6>
+                <p class="mb-0 small opacity-90">@ViewBag.Notification</p>
+            </div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+    }
 
-    <!-- Hiển thị thông báo khi thanh toán thành công -->
+    <!-- Thông báo thành công -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success fw-bold shadow-sm">
-            @TempData["SuccessMessage"]
+        <div class="alert alert-success border-0 shadow-sm rounded-4 p-4 mb-5 d-flex align-items-center">
+            <div class="bg-white bg-opacity-20 p-2 rounded-circle me-3 text-success">
+                <i class="bi bi-check-circle-fill fs-3"></i>
+            </div>
+            <span class="fw-bold">@TempData["SuccessMessage"]</span>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
         </div>
     }
 
     @if (!Model.Any())
     {
-        <div class="alert alert-info">Bạn chưa có khoản vay nào đang hoạt động.</div>
+        <div class="text-center py-5 bg-white rounded-5 shadow-sm border border-dashed my-5">
+            <div class="mb-4">
+                <i class="bi bi-calendar-x text-muted display-1 opacity-25"></i>
+            </div>
+            <h4 class="fw-bold text-dark">Chưa có lịch trả nợ</h4>
+            <p class="text-secondary mb-4 px-lg-5">Bạn hiện không có khoản vay nào đang hoạt động. Hãy đăng ký một gói vay ngay để giải quyết nhu cầu tài chính.</p>
+            <a asp-controller="LoanApplications" asp-action="Create" class="btn btn-primary rounded-pill px-5 py-3 fw-bold shadow-blue hover-lift">
+                TẠO ĐƠN VAY NGAY
+            </a>
+        </div>
     }
 
     @foreach (var loan in Model)
     {
-        <div class="card mb-5 shadow-sm border-0">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">
-                    Khoản vay: @loan.Package?.PackageName -
-                    Tổng tiền: @loan.LoanAmount.ToString("#,##0") VNĐ
-                </h5>
+        <div class="card border-0 shadow-lg rounded-5 overflow-hidden mb-5 loan-card">
+            <div class="card-header bg-dark p-4 p-md-5 border-0 position-relative overflow-hidden">
+                <div class="position-relative z-index-2">
+                    <div class="row align-items-center">
+                        <div class="col-md-7 mb-4 mb-md-0">
+                            <span class="badge bg-primary rounded-pill px-3 py-2 mb-3 fw-bold text-uppercase ls-1">@loan.Package?.PackageName</span>
+                            <h3 class="text-white fw-black mb-2 display-6">@loan.LoanAmount.ToString("#,##0") <span class="fs-4 fw-normal opacity-75">VNĐ</span></h3>
+                            <p class="text-white-50 mb-0 small fw-medium">
+                                <i class="bi bi-calendar-week me-2"></i>Kỳ hạn: @loan.TermMonths tháng | <i class="bi bi-hash me-2"></i>Mã đơn vay: #@loan.Id
+                            </p>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="bg-white bg-opacity-10 rounded-4 p-4 border border-white border-opacity-10 shadow-inner">
+                                @{
+                                    var totalPaidCount = loan.RepaymentSchedules.Count(s => s.IsPaid);
+                                    var totalCount = loan.RepaymentSchedules.Count();
+                                    var progressPercent = totalCount > 0 ? (totalPaidCount * 100 / totalCount) : 0;
+                                }
+                                <div class="d-flex justify-content-between align-items-end mb-2">
+                                    <small class="text-white-50 fw-bold text-uppercase">Tiến độ hoàn trả</small>
+                                    <span class="text-white fw-black">@progressPercent%</span>
+                                </div>
+                                <div class="progress rounded-pill bg-white bg-opacity-10 mb-2" style="height: 10px;">
+                                    <div class="progress-bar bg-success shadow-sm progress-bar-striped progress-bar-animated" role="progressbar" style="width: @progressPercent%"></div>
+                                </div>
+                                <small class="text-white-50">Đã thanh toán: <strong>@totalPaidCount/@totalCount</strong> kỳ hạn</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cta-circle-1" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); opacity: 0.1; top: -50px; right: -50px;"></div>
             </div>
-            <div class="card-body p-0">
+
+            <div class="card-body p-0 bg-white">
                 <div class="table-responsive">
-                    <table class="table table-hover table-striped mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Kỳ thứ</th>
-                                <th>Hạn thanh toán</th>
-                                <th>Tiền gốc</th>
-                                <th>Tiền lãi</th>
-                                <th>Tổng phải trả</th>
-                                <th>Trạng thái</th>
-                                <th>Hành động</th>
+                    <table class="table table-hover align-middle mb-0 custom-table">
+                        <thead class="bg-light">
+                            <tr class="text-secondary small text-uppercase fw-bold">
+                                <th class="ps-4 ps-md-5 py-3 text-center" style="width: 80px;">Kỳ</th>
+                                <th class="py-3">Hạn thanh toán</th>
+                                <th class="py-3">Chi tiết Gốc & Lãi</th>
+                                <th class="py-3">Tổng cộng</th>
+                                <th class="py-3">Trạng thái</th>
+                                <th class="pe-4 pe-md-5 py-3 text-end">Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Sắp xếp các kỳ theo thứ tự 1,2,3... -->
                             @foreach (var item in loan.RepaymentSchedules.OrderBy(s => s.InstallmentNumber))
                             {
-                                <tr>
-                                    <td class="fw-bold text-center">@item.InstallmentNumber</td>
-                                    <td>@item.DueDate.ToString("dd/MM/yyyy")</td>
-                                    <td>@item.PrincipalAmount.ToString("#,##0")</td>
-                                    <td>@item.InterestAmount.ToString("#,##0")</td>
-                                    <td><strong class="text-danger">@item.TotalAmount.ToString("#,##0") VNĐ</strong></td>
+                                <tr class="@(item.IsPaid ? "paid-row" : "")">
+                                    <td class="ps-4 ps-md-5 text-center">
+                                        <div class="fw-black fs-5 text-dark">@item.InstallmentNumber</div>
+                                    </td>
                                     <td>
-                                        @if (item.IsPaid)
+                                        <div class="fw-bold text-dark">@item.DueDate.ToString("dd/MM/yyyy")</div>
+                                        @if (!item.IsPaid && item.DueDate < DateTime.Now)
                                         {
-                                            <span class="badge bg-success">Đã thanh toán</span>
-                                
-                                            <br />
-                                            <small class="text-muted">Ngày: @item.PaidDate?.ToString("dd/MM/yyyy")</small>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-warning text-dark">Chưa thanh toán</span>
+                                            <span class="badge bg-danger bg-opacity-10 text-danger x-small fw-bold mt-1">
+                                                <i class="bi bi-clock-history me-1"></i> QUÁ HẠN
+                                            </span>
                                         }
                                     </td>
                                     <td>
+                                        <div class="small text-muted">Gốc: @item.PrincipalAmount.ToString("#,##0") đ</div>
+                                        <div class="small text-muted">Lãi: @item.InterestAmount.ToString("#,##0") đ</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-black text-primary">@item.TotalAmount.ToString("#,##0") đ</div>
+                                    </td>
+                                    <td>
+                                        @if (item.IsPaid)
+                                        {
+                                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-bold border border-success border-opacity-10">
+                                                <i class="bi bi-check-circle-fill me-1"></i> ĐÃ TRẢ
+                                            </span>
+                                            <div class="x-small text-muted mt-1 italic">Ngày: @item.PaidDate?.ToString("dd/MM/yyyy")</div>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2 fw-bold border border-warning border-opacity-10">
+                                                <i class="bi bi-hourglass-split me-1"></i> CHỜ ĐÓNG
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="pe-4 pe-md-5 text-end">
                                         @if (!item.IsPaid)
                                         {
                                             <form asp-controller="Payment" asp-action="PayInstallment" asp-route-id="@item.Id" method="post">
-                                                <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3"
-                                                        onclick="return confirm('Xác nhận thanh toán @item.TotalAmount.ToString("#,##0") VNĐ cho kỳ này?');">
-                                                    Thanh toán ngay
+                                                <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold btn-pay shadow-sm transition-all"
+                                                        onclick="return confirm('Xác nhận thanh toán số tiền @item.TotalAmount.ToString("#,##0") đ cho kỳ này?');">
+                                                    THANH TOÁN
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            @* THAY ĐỔI: Chuyển "In biên lai" thành "Gửi biên lai về email" *@
+                                            <form asp-controller="Payment" asp-action="SendEmailReceipt" asp-route-id="@item.Id" method="post">
+                                                <button type="submit" class="btn btn-outline-primary rounded-pill px-4 fw-bold shadow-sm hover-lift transition-all small">
+                                                    <i class="bi bi-envelope-at me-2"></i> Gửi biên lai
                                                 </button>
                                             </form>
                                         }
@@ -88,6 +172,90 @@
                     </table>
                 </div>
             </div>
+
+            <div class="card-footer bg-light p-4 text-center border-0">
+                <small class="text-muted italic fw-medium">
+                    <i class="bi bi-shield-lock-fill text-success me-1"></i> Mọi giao dịch và biên lai của bạn được bảo vệ bởi tiêu chuẩn an ninh PCI DSS
+                </small>
+            </div>
         </div>
     }
 </div>
+
+<style>
+    .fw-black {
+        font-weight: 900;
+    }
+
+    .ls-1 {
+        letter-spacing: 1px;
+    }
+
+    .ls-2 {
+        letter-spacing: 2px;
+    }
+
+    .x-small {
+        font-size: 0.7rem;
+    }
+
+    .italic {
+        font-style: italic;
+    }
+
+    .shadow-inner {
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+    }
+
+    .loan-card {
+        transition: all 0.3s ease;
+    }
+
+    .custom-table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+        .custom-table tbody tr:hover {
+            background-color: #f8faff;
+        }
+
+    .paid-row {
+        opacity: 0.65;
+        filter: grayscale(0.2);
+    }
+
+    .btn-pay:hover, .hover-lift:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(13, 110, 253, 0.2) !important;
+    }
+
+    .shadow-blue {
+        box-shadow: 0 10px 30px rgba(13, 110, 253, 0.2);
+    }
+
+    .animate-pulse {
+        animation: pulse-alert 2s infinite;
+    }
+
+    @@keyframes pulse-alert {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.005);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .cta-circle-1 {
+        position: absolute;
+        width: 250px;
+        height: 250px;
+        border-radius: 50%;
+        z-index: 1;
+    }
+</style>

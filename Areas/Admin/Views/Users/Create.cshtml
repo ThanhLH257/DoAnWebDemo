@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Thêm Người Dùng Mới";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-lg rounded-5 overflow-hidden">
+                <div class="bg-primary py-4 text-center">
+                    <h4 class="fw-black text-white mb-0"><i class="bi bi-person-plus-fill me-2"></i> THÊM TÀI KHOẢN</h4>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="All" class="text-danger small mb-3"></div>
+
+                        <div class="form-floating mb-3 shadow-sm rounded-4 overflow-hidden border border-light">
+                            <input type="text" name="FullName" class="form-control border-0 bg-light" required placeholder="Họ tên" />
+                            <label>Họ và tên <span class="text-danger">*</span></label>
+                        </div>
+
+                        <div class="form-floating mb-3 shadow-sm rounded-4 overflow-hidden border border-light">
+                            <input type="email" name="Email" class="form-control border-0 bg-light" required placeholder="Email" />
+                            <label>Địa chỉ Email <span class="text-danger">*</span></label>
+                        </div>
+
+                        <div class="form-floating mb-3 shadow-sm rounded-4 overflow-hidden border border-light">
+                            <input type="text" name="PhoneNumber" class="form-control border-0 bg-light" placeholder="SĐT" />
+                            <label>Số điện thoại</label>
+                        </div>
+
+                        <div class="form-floating mb-3 shadow-sm rounded-4 overflow-hidden border border-light">
+                            <input type="password" name="Password" class="form-control border-0 bg-light" required placeholder="Mật khẩu" />
+                            <label>Mật khẩu khởi tạo <span class="text-danger">*</span></label>
+                        </div>
+
+                        <div class="mb-4 p-3 bg-light rounded-4">
+                            <label class="fw-bold small mb-2 text-secondary">Phân quyền tài khoản</label>
+                            <select name="Role" class="form-select border-0 shadow-sm rounded-3">
+                                <option value="Borrower">Khách hàng (Borrower)</option>
+                                <option value="Admin">Quản trị viên (Admin)</option>
+                            </select>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary py-3 rounded-pill fw-bold shadow-sm hover-lift">TẠO TÀI KHOẢN</button>
+                            <a asp-action="Index" class="btn btn-link text-secondary text-decoration-none fw-medium">Hủy bỏ</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

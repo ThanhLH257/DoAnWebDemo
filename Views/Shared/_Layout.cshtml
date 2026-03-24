@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,112 +7,296 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DoAnWebDemo.styles.css" asp-append-version="true" />
-
-    <!-- Tích hợp thư viện Icon của Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!-- Tích hợp Font chữ Inter chuẩn UI/UX hiện đại -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
-        /* Ép Font chữ và cấu hình Footer luôn nằm dưới cùng */
+        :root {
+            --primary-blue: #0d6efd;
+            --soft-bg: #f8f9fa;
+            --premium-dark: #1a1a1a;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
+            height: 100%;
+        }
+
+        /* Đã sửa lỗi "lòi trắng": Ép bỏ margin/padding dư thừa và chống tràn ngang */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8f9fa;
+            background-color: var(--soft-bg);
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            margin-bottom: 0 !important; /* Xóa bỏ khoảng trắng 60px mặc định của ASP.NET trong file site.css */
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow-x: hidden;
+            width: 100%;
         }
 
-        .navbar-brand {
-            font-size: 1.6rem;
-            letter-spacing: 0.5px;
+        .navbar {
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            z-index: 1050;
+            border-radius: 0 !important;
         }
 
         .nav-link {
             font-weight: 500;
-            transition: color 0.3s ease, transform 0.2s ease;
+            padding: 0.5rem 1.2rem !important;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
+            .nav-link::after {
+                content: '';
+                position: absolute;
+                width: 0;
+                height: 2px;
+                bottom: 5px;
+                left: 50%;
+                background-color: #ffc107;
+                transition: all 0.3s ease;
+                transform: translateX(-50%);
+            }
+
+            .nav-link:hover::after {
+                width: 70%;
+            }
+
             .nav-link:hover {
-                color: #e0f7fa !important;
+                color: #ffc107 !important;
                 transform: translateY(-1px);
             }
+
+        .btn-cta {
+            background-color: #ffc107;
+            color: #0d47a1;
+            font-weight: 800;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+            transition: all 0.3s ease;
+            border: none;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+            .btn-cta:hover {
+                background-color: #ffca2c;
+                transform: scale(1.05);
+                color: #000;
+            }
+
+        /* === THIẾT KẾ MODAL CAO CẤP === */
+        .premium-modal .modal-content {
+            border: none;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.2);
+        }
+
+        .premium-modal .modal-header-visual {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px 20px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .premium-modal .icon-wrapper {
+            width: 90px;
+            height: 90px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 2.5rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            animation: premiumFloat 3s ease-in-out infinite;
+        }
+
+        .premium-modal .modal-body {
+            padding: 40px 45px !important;
+            background: white;
+        }
+
+        .premium-modal .modal-title {
+            font-weight: 900;
+            color: var(--premium-dark);
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+        }
+
+        .premium-modal .btn-login {
+            background: var(--premium-dark);
+            color: white;
+            border-radius: 15px;
+            padding: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border: none;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+            .premium-modal .btn-login:hover {
+                background: #333;
+                transform: translateY(-3px);
+                box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            }
+
+        .premium-modal .btn-reg-link {
+            color: var(--primary-blue);
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+            .premium-modal .btn-reg-link:hover {
+                color: #0056b3;
+                opacity: 0.8;
+            }
+
+        .premium-modal .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+            .premium-modal .close-btn:hover {
+                background: rgba(255,255,255,0.4);
+                transform: rotate(90deg);
+            }
+
+        /* === THIẾT KẾ FOOTER HOÀN HẢO === */
+        footer {
+            width: 100%;
+            margin-top: auto;
+            margin-bottom: 0 !important;
+        }
 
         .footer-link {
             color: #adb5bd;
             text-decoration: none;
-            transition: color 0.3s, padding-left 0.3s;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
         }
 
             .footer-link:hover {
                 color: #ffffff;
-                padding-left: 5px;
+                padding-left: 8px;
             }
+
+        .pci-badge {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+        }
+
+        .fw-black {
+            font-weight: 900;
+        }
+
+        @@keyframes premiumFloat {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
     <header class="sticky-top">
-        <!-- Đổi màu thanh Nav thành xanh dương đậm của Ngân hàng -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary border-bottom shadow-sm py-3">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary py-3 shadow">
             <div class="container-fluid px-4 px-lg-5">
-                <a class="navbar-brand fw-extrabold" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-bank2 me-2 text-warning"></i>Fast<span class="text-warning">Loan</span>
+                <a class="navbar-brand fw-black d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+                    <div class="bg-warning rounded-3 p-1 me-2 shadow-sm">
+                        <i class="bi bi-bank2 text-primary fs-4"></i>
+                    </div>
+                    <span>Fast<span class="text-warning">Loan</span></span>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1 ms-lg-4">
-                        <li class="nav-item">
-                            <a class="nav-link text-white px-3" asp-area="" asp-controller="Home" asp-action="Index">
-                                <i class="bi bi-house-door me-1"></i> Trang chủ
-                            </a>
-                        </li>
 
-                        <!-- Menu thông minh: Chỉ hiện khi ĐÃ ĐĂNG NHẬP -->
+                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                    <i class="bi bi-list fs-1 text-white"></i>
+                </button>
+
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1 ms-lg-4 gap-1">
+                        <li class="nav-item"><a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            // Nếu là ADMIN -> Hiện menu của Admin
-                            if (User.IsInRole("Admin"))
+                            @if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle text-white px-3" href="#" id="adminMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-shield-lock me-1"></i> Quản trị Admin
-                                    </a>
-                                    <ul class="dropdown-menu shadow-lg border-0 mt-2 rounded-3" aria-labelledby="adminMenu">
-                                        <li><a class="dropdown-item py-2 fw-semibold text-secondary" asp-area="Admin" asp-controller="Home" asp-action="Index"><i class="bi bi-speedometer2 text-primary me-2"></i> Dashboard Thống Kê</a></li>
-                                        <li><a class="dropdown-item py-2 fw-semibold text-secondary" asp-area="Admin" asp-controller="LoanApprove" asp-action="Index"><i class="bi bi-file-earmark-check text-success me-2"></i> Duyệt Đơn & Giải Ngân</a></li>
+                                    <a class="nav-link dropdown-toggle text-white fw-bold" href="#" id="adminMenu" data-bs-toggle="dropdown"><i class="bi bi-shield-lock-fill text-warning"></i> QUẢN TRỊ</a>
+                                    <ul class="dropdown-menu shadow border-0 rounded-3 mt-2">
+                                        <li><a class="dropdown-item py-2" asp-area="Admin" asp-controller="Home" asp-action="Index">Thống kê</a></li>
+                                        <li><a class="dropdown-item py-2" asp-area="Admin" asp-controller="LoanApprove" asp-action="Index">Duyệt đơn vay</a></li>
+                                        <li><a class="dropdown-item py-2" asp-area="Admin" asp-controller="Users" asp-action="Index">Quản lý người dùng</a></li>
                                         <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item py-2 fw-semibold text-secondary" asp-area="" asp-controller="LoanPackages" asp-action="Index"><i class="bi bi-box-seam text-warning me-2"></i> Quản lý Gói Vay</a></li>
+                                        <li><a class="dropdown-item py-2" asp-area="" asp-controller="LoanPackages" asp-action="Index">Gói sản phẩm</a></li>
                                     </ul>
                                 </li>
                             }
-                            // Nếu là KHÁCH HÀNG -> Hiện menu của Khách
                             else
                             {
-                                <li class="nav-item">
-                                    <a class="nav-link text-white px-3" asp-area="" asp-controller="LoanApplications" asp-action="Create">
-                                        <i class="bi bi-pencil-square me-1"></i> Nộp Đơn Vay
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-white px-3" asp-area="" asp-controller="Payment" asp-action="Index">
-                                        <i class="bi bi-calendar-check me-1"></i> Lịch Trả Nợ
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-white px-3" asp-area="" asp-controller="Profile" asp-action="Index">
-                                        <i class="bi bi-person-badge me-1"></i> Hồ sơ eKYC
-                                    </a>
-                                </li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-area="" asp-controller="LoanApplications" asp-action="Index">Đơn vay</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-area="" asp-controller="LoanApplications" asp-action="Create">Vay tiền</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-area="" asp-controller="Payment" asp-action="Index">Trả nợ</a></li>
                             }
                         }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link text-white section-scroll" href="/Home/Index#packages-section">Gói vay</a></li>
+                            <li class="nav-item"><a class="nav-link text-white section-scroll" href="/Home/Index#benefits">Ưu điểm</a></li>
+                            <li class="nav-item"><a class="nav-link text-white section-scroll" href="/Home/Index#how-it-works">Quy trình</a></li>
+                        }
                     </ul>
-                    <!-- Component Login góc phải -->
-                    <div class="d-flex align-items-center">
+
+                    <div class="d-flex align-items-center gap-2">
+                        @if (!User.Identity.IsAuthenticated)
+                        {
+                            <a href="javascript:void(0)" class="btn btn-cta d-none d-xl-inline-block btn-guest-trigger">VAY NGAY</a>
+                        }
                         <partial name="_LoginPartial" />
                     </div>
                 </div>
@@ -120,71 +304,107 @@
         </nav>
     </header>
 
-    <!-- Bỏ thẻ container bao quanh RenderBody để Landing Page được tràn màn hình -->
-    <main role="main" class="flex-grow-1 pb-5">
+    <main role="main" class="flex-grow-1 w-100">
         @RenderBody()
     </main>
 
-    <!-- Khu vực Footer Khổng Lồ -->
-    <footer class="bg-dark text-light pt-5 pb-4 mt-auto">
-        <div class="container px-4">
-            <div class="row text-center text-md-start">
+    <!-- === MODAL ĐĂNG NHẬP NÂNG CẤP (PREMIUM) === -->
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <div class="modal fade premium-modal" id="guestPromptModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow-2xl">
+                    <div class="modal-header-visual">
+                        <button type="button" class="close-btn" data-bs-dismiss="modal" aria-label="Close">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                        <div class="icon-wrapper">
+                            <i class="bi bi-fingerprint"></i>
+                        </div>
+                    </div>
+                    <div class="modal-body text-center">
+                        <h3 class="modal-title">Tiếp tục hành trình?</h3>
+                        <p class="text-muted mb-5 lh-base">
+                            Chào mừng bạn đến với <strong>FastLoan</strong>. Để nộp hồ sơ vay hoặc xem lịch nợ, vui lòng đăng nhập vào tài khoản của bạn.
+                        </p>
+
+                        <div class="d-grid gap-3">
+                            <a href="/Identity/Account/Login" class="btn btn-login shadow-lg text-decoration-none">
+                                <i class="bi bi-box-arrow-in-right me-2"></i> ĐĂNG NHẬP NGAY
+                            </a>
+                            <p class="mt-2 small text-secondary">
+                                Bạn là thành viên mới?
+                                <a href="/Identity/Account/Register" class="btn-reg-link ms-1">Đăng ký tài khoản</a>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-light py-3 text-center border-top">
+                        <small class="text-muted italic"><i class="bi bi-shield-check text-success"></i> Dữ liệu của bạn được bảo mật tuyệt đối</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- === FOOTER CHI TIẾT (HOÀN HẢO) === -->
+    <footer class="bg-dark text-light pt-5 pb-4">
+        <div class="container-fluid px-4 px-lg-5">
+            <div class="row text-center text-md-start g-4">
                 <!-- Cột Thương hiệu -->
-                <div class="col-md-4 col-lg-4 col-xl-4 mx-auto mb-4">
-                    <h5 class="text-uppercase fw-extrabold mb-4 fs-4">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="text-uppercase fw-black mb-4 fs-4">
                         <i class="bi bi-bank2 me-2 text-warning"></i>Fast<span class="text-warning">Loan</span> VN
                     </h5>
-                    <p class="text-secondary lh-lg">
-                        Giải pháp tài chính thông minh, minh bạch và an toàn. Chúng tôi cung cấp các gói vay trực tuyến duyệt tự động bằng công nghệ AI 24/7, giúp bạn giải quyết nhu cầu vốn nhanh nhất.
+                    <p class="text-secondary lh-lg small pe-lg-5">
+                        Giải pháp tài chính thông minh, minh bạch và an toàn. Ứng dụng công nghệ AI để phê duyệt khoản vay 24/7, đồng hành cùng bạn trong mọi mục tiêu tài chính cá nhân.
                     </p>
-                    <div class="mt-4">
-                        <a href="#" class="btn btn-outline-secondary btn-sm rounded-circle me-2"><i class="bi bi-facebook"></i></a>
-                        <a href="#" class="btn btn-outline-secondary btn-sm rounded-circle me-2"><i class="bi bi-youtube"></i></a>
-                        <a href="#" class="btn btn-outline-secondary btn-sm rounded-circle me-2"><i class="bi bi-linkedin"></i></a>
-                        <a href="#" class="btn btn-outline-secondary btn-sm rounded-circle"><i class="bi bi-tiktok"></i></a>
+                    <div class="mt-4 d-flex gap-2 justify-content-center justify-content-md-start">
+                        <a href="#" class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm"><i class="bi bi-google"></i></a>
                     </div>
                 </div>
 
-                <!-- Cột Liên kết 1 -->
-                <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4 mt-2">
-                    <h6 class="text-uppercase fw-bold mb-4">Về chúng tôi</h6>
-                    <p><a href="#!" class="footer-link"><i class="bi bi-chevron-right small text-secondary"></i> Câu chuyện FastLoan</a></p>
-                    <p><a href="#!" class="footer-link"><i class="bi bi-chevron-right small text-secondary"></i> Các gói vay</a></p>
-                    <p><a href="#!" class="footer-link"><i class="bi bi-chevron-right small text-secondary"></i> Biểu phí & Lãi suất</a></p>
-                    <p><a href="#!" class="footer-link"><i class="bi bi-chevron-right small text-secondary"></i> Tuyển dụng</a></p>
+                <!-- Cột Sản phẩm -->
+                <div class="col-6 col-md-2 mb-4 mb-md-0">
+                    <h6 class="text-uppercase fw-bold mb-4 small text-white border-bottom border-secondary pb-2">Sản phẩm</h6>
+                    <ul class="list-unstyled mt-3">
+                        <li><a href="#!" class="footer-link mb-2 d-block">Gói vay sinh viên</a></li>
+                        <li><a href="#!" class="footer-link mb-2 d-block">Vay nhanh 24/7</a></li>
+                        <li><a href="#!" class="footer-link mb-2 d-block">Trả góp tín chấp</a></li>
+                    </ul>
                 </div>
 
-                <!-- Cột Liên kết 2 -->
-                <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4 mt-2">
-                    <h6 class="text-uppercase fw-bold mb-4">Hỗ trợ khách hàng</h6>
-                    <p><a href="#!" class="footer-link"><i class="bi bi-chevron-right small text-secondary"></i> Hướng dẫn vay vốn</a></p>
-                    <p><a href="#!" class="footer-link"><i class="bi bi-chevron-right small text-secondary"></i> Hướng dẫn thanh toán</a></p>
-                    <p><a href="#!" class="footer-link"><i class="bi bi-chevron-right small text-secondary"></i> Câu hỏi thường gặp</a></p>
-                    <p><a href="#!" class="footer-link"><i class="bi bi-chevron-right small text-secondary"></i> Chính sách bảo mật</a></p>
+                <!-- Cột Hỗ trợ -->
+                <div class="col-6 col-md-3 mb-4 mb-md-0">
+                    <h6 class="text-uppercase fw-bold mb-4 small text-white border-bottom border-secondary pb-2">Hỗ trợ</h6>
+                    <ul class="list-unstyled mt-3">
+                        <li><a href="#!" class="footer-link mb-2 d-block">Xác thực eKYC</a></li>
+                        <li><a href="#!" class="footer-link mb-2 d-block">Phương thức nộp đơn</a></li>
+                        <li><a href="#!" class="footer-link mb-2 d-block">Câu hỏi thường gặp</a></li>
+                    </ul>
                 </div>
 
-                <!-- Cột Thông tin liên hệ -->
-                <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4 mt-2">
-                    <h6 class="text-uppercase fw-bold mb-4">Thông tin liên hệ</h6>
-                    <p class="text-secondary"><i class="bi bi-geo-alt-fill me-3 text-light"></i> Khu Công Nghệ Cao, Tp.Thủ Đức, TP.HCM</p>
-                    <p class="text-secondary"><i class="bi bi-envelope-fill me-3 text-light"></i> hotro@fastloan.demo.vn</p>
-                    <p class="text-secondary"><i class="bi bi-telephone-fill me-3 text-light"></i> 1900 9999 (Hỗ trợ 24/7)</p>
-                    <p class="text-secondary"><i class="bi bi-clock-fill me-3 text-light"></i> T2 - T6: 08:00 - 18:00</p>
+                <!-- Cột Liên hệ -->
+                <div class="col-md-3">
+                    <h6 class="text-uppercase fw-bold mb-4 small text-white border-bottom border-secondary pb-2">Liên hệ</h6>
+                    <p class="text-secondary small mb-2 mt-3"><i class="bi bi-geo-alt-fill me-2 text-primary"></i> Quận Thủ Đức, TP.HCM</p>
+                    <p class="text-secondary small mb-2"><i class="bi bi-envelope-at-fill me-2 text-primary"></i> support@fastloan.vn</p>
+                    <p class="text-secondary small mb-0"><i class="bi bi-telephone-outbound-fill me-2 text-primary"></i> 1900 8888</p>
                 </div>
             </div>
 
-            <hr class="mb-4 bg-secondary" style="opacity: 0.3;" />
+            <hr class="my-4 bg-secondary" style="opacity: 0.1;" />
 
-            <!-- Cột Bản quyền và Logo Chứng nhận -->
             <div class="row align-items-center">
-                <div class="col-md-7 col-lg-8">
-                    <p class="text-secondary mb-0 fw-medium">
-                        &copy; 2026 FastLoan FinTech. Đồ án lập trình Web - Nhóm 5. All rights reserved.
+                <div class="col-md-7 text-center text-md-start">
+                    <p class="text-secondary mb-0 fw-medium small">
+                        &copy; 2026 FastLoan FinTech. Đồ án lập trình Web - Nhóm 5.
                     </p>
                 </div>
-                <div class="col-md-5 col-lg-4 text-center text-md-end mt-3 mt-md-0">
-                    <span class="badge bg-secondary bg-opacity-25 text-light px-3 py-2 rounded-pill">
-                        <i class="bi bi-shield-check text-success me-1"></i> Chứng nhận bảo mật PCI DSS
+                <div class="col-md-5 text-center text-md-end mt-3 mt-md-0">
+                    <span class="badge pci-badge text-light px-3 py-2 rounded-pill">
+                        <i class="bi bi-shield-lock-fill text-success me-1"></i> Bảo mật PCI DSS v4.0
                     </span>
                 </div>
             </div>
@@ -193,7 +413,36 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Sửa logic kích hoạt Modal
+            const triggers = document.querySelectorAll('.btn-guest-trigger');
+            triggers.forEach(t => {
+                t.addEventListener('click', () => {
+                    const modalEl = document.getElementById('guestPromptModal');
+                    if (modalEl) {
+                        const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+                        modalInstance.show();
+                    }
+                });
+            });
+
+            // Smooth scroll
+            document.querySelectorAll('.section-scroll').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (href.includes('#') && (window.location.pathname === '/' || window.location.pathname === '/Home/Index')) {
+                        const targetId = href.split('#')[1];
+                        const targetElement = document.getElementById(targetId);
+                        if (targetElement) {
+                            e.preventDefault();
+                            targetElement.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

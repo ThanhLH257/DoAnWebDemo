@@ -1,70 +1,81 @@
 ﻿@model DoAnWebDemo.Models.LoanApplication
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Cập nhật đơn vay";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Edit</h1>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-lg rounded-5 overflow-hidden">
+                <div class="card-header bg-warning p-4 text-center">
+                    <h4 class="fw-black text-dark mb-0"><i class="bi bi-pencil-square me-2"></i> CHỈNH SỬA HỒ SƠ</h4>
+                    <small class="text-dark opacity-75">Cập nhật thông tin đơn vay số #@Model.Id</small>
+                </div>
+                <div class="card-body p-4 p-md-5 bg-white">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-4"></div>
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="UserId" />
+                        <input type="hidden" asp-for="CreatedAt" />
 
-<h4>LoanApplication</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
-                <span asp-validation-for="UserId" class="text-danger"></span>
+                        <div class="row g-4">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-primary small">TRẠNG THÁI HỆ THỐNG</label>
+                                    <select asp-for="Status" class="form-select rounded-4 border-primary bg-light fw-bold">
+                                        <option value="Pending">Pending (Đang chờ)</option>
+                                        <option value="Approved">Approved (Phê duyệt)</option>
+                                        <option value="Rejected">Rejected (Từ chối)</option>
+                                        <option value="Active">Active (Giải ngân)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-primary small">ĐIỂM TÍN DỤNG</label>
+                                    <input asp-for="CreditScore" class="form-control rounded-4 border-primary bg-light fw-bold" type="number" />
+                                </div>
+                            }
+                            else
+                            {
+                                <input type="hidden" asp-for="Status" />
+                                <input type="hidden" asp-for="CreditScore" />
+                            }
+
+                            <div class="col-12">
+                                <label class="form-label fw-bold text-secondary small">GÓI SẢN PHẨM</label>
+                                <select asp-for="PackageId" class="form-select rounded-4 bg-light border-0 fw-bold" asp-items="ViewBag.PackageId"></select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-secondary small">SỐ TIỀN VAY (VNĐ)</label>
+                                <input asp-for="LoanAmount" class="form-control rounded-4 bg-light border-0 fw-black text-danger" />
+                                <span asp-validation-for="LoanAmount" class="text-danger x-small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-secondary small">KỲ HẠN (THÁNG)</label>
+                                <input asp-for="TermMonths" class="form-control rounded-4 bg-light border-0 fw-bold" />
+                                <span asp-validation-for="TermMonths" class="text-danger x-small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-bold text-secondary small">MỤC ĐÍCH VAY</label>
+                                <textarea asp-for="Purpose" class="form-control rounded-4 bg-light border-0" style="height: 100px"></textarea>
+                                <span asp-validation-for="Purpose" class="text-danger x-small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 d-grid gap-2">
+                            <button type="submit" class="btn btn-warning btn-lg py-3 rounded-pill fw-black shadow-sm hover-lift">
+                                LƯU THÔNG TIN THAY ĐỔI
+                            </button>
+                            <a asp-action="Index" class="btn btn-link text-secondary text-decoration-none">Hủy bỏ</a>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="PackageId" class="control-label"></label>
-                <select asp-for="PackageId" class="form-control" asp-items="ViewBag.PackageId"></select>
-                <span asp-validation-for="PackageId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="LoanAmount" class="control-label"></label>
-                <input asp-for="LoanAmount" class="form-control" />
-                <span asp-validation-for="LoanAmount" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TermMonths" class="control-label"></label>
-                <input asp-for="TermMonths" class="form-control" />
-                <span asp-validation-for="TermMonths" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Purpose" class="control-label"></label>
-                <input asp-for="Purpose" class="form-control" />
-                <span asp-validation-for="Purpose" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreditScore" class="control-label"></label>
-                <input asp-for="CreditScore" class="form-control" />
-                <span asp-validation-for="CreditScore" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedAt" class="control-label"></label>
-                <input asp-for="CreatedAt" class="form-control" />
-                <span asp-validation-for="CreatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}

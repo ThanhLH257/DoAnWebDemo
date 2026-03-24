@@ -1,66 +1,188 @@
 ﻿@model DoAnWebDemo.Models.ApplicationUser
 
 @{
-    ViewData["Title"] = "Hồ sơ eKYC";
+    ViewData["Title"] = "Xác thực danh tính eKYC";
 }
 
-<div class="container mt-5">
+<div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><i class="bi bi-person-badge"></i> Hồ Sơ Của Tôi (eKYC)</h4>
-                </div>
-                <div class="card-body">
+        <div class="col-lg-8">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-dark text-uppercase">Xác thực danh tính (eKYC)</h2>
+                <p class="text-muted">Vui lòng cung cấp ảnh CCCD chính chủ để hoàn thiện hồ sơ vay vốn</p>
+            </div>
 
-                    @if (TempData["Success"] != null)
-                    {
-                        <div class="alert alert-success">@TempData["Success"]</div>
-                    }
-                    @if (TempData["Error"] != null)
-                    {
-                        <div class="alert alert-danger">@TempData["Error"]</div>
-                    }
-
-                    <ul class="list-group mb-4">
-                        <li class="list-group-item"><strong>Họ và tên:</strong> @Model.FullName</li>
-                        <li class="list-group-item"><strong>Email:</strong> @Model.Email</li>
-                        <li class="list-group-item"><strong>Số CCCD:</strong> @Model.CCCD</li>
-                        <li class="list-group-item">
-                            <strong>Trạng thái:</strong>
-                            @if (Model.IsKycVerified)
-                            {
-                                <span class="badge bg-success">Đã xác thực</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-warning text-dark">Chưa xác thực</span>
-                            }
-                        </li>
-                    </ul>
-
-                    <h5 class="text-secondary mb-3">Tải lên ảnh CCCD mặt trước</h5>
-
-                    <!-- Bắt buộc phải có enctype="multipart/form-data" -->
-                    <form asp-action="UploadCCCD" asp-controller="Profile" method="post" enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <input type="file" name="cccdImage" class="form-control" accept="image/*" required />
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="row g-0">
+                    <div class="col-md-5 bg-primary text-white p-4 p-lg-5 d-flex flex-column justify-content-center">
+                        <h5 class="fw-bold mb-4"><i class="bi bi-shield-check"></i> Quy định chụp ảnh</h5>
+                        <ul class="list-unstyled small lh-lg">
+                            <li class="mb-2"><i class="bi bi-check2-circle me-2"></i> Ảnh chụp rõ nét, không bị nhòe.</li>
+                            <li class="mb-2"><i class="bi bi-check2-circle me-2"></i> Không bị lóa sáng hoặc mất góc.</li>
+                            <li class="mb-2"><i class="bi bi-check2-circle me-2"></i> CCCD còn hạn sử dụng.</li>
+                            <li class="mb-2"><i class="bi bi-check2-circle me-2"></i> Không sử dụng ảnh chụp lại từ màn hình.</li>
+                        </ul>
+                        <div class="mt-4 p-3 bg-white bg-opacity-10 rounded-3 border border-white border-opacity-25">
+                            <p class="mb-0 small italic"><strong>Lưu ý:</strong> Thông tin của bạn được bảo mật tuyệt đối theo tiêu chuẩn quốc tế.</p>
                         </div>
-                        <button type="submit" class="btn btn-success w-100">
-                            <i class="bi bi-cloud-upload"></i> Tải Ảnh Lên
-                        </button>
-                    </form>
+                    </div>
 
-                    <!-- Hiển thị ảnh nếu đã upload -->
-                    @if (!string.IsNullOrEmpty(Model.CccdFrontImage))
-                    {
-                        <div class="mt-4 text-center">
-                            <p class="text-muted">Ảnh hiện tại:</p>
-                            <img src="@Model.CccdFrontImage" alt="CCCD" class="img-fluid rounded border shadow-sm" style="max-height: 200px; object-fit: cover;" />
+                    <div class="col-md-7 p-4 p-lg-5 bg-white">
+                        @if (TempData["Success"] != null)
+                        {
+                            <div class="alert alert-success border-0 shadow-sm mb-4">
+                                <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+                            </div>
+                        }
+                        @if (TempData["Error"] != null)
+                        {
+                            <div class="alert alert-danger border-0 shadow-sm mb-4">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+                            </div>
+                        }
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-secondary small">THÔNG TIN CƠ BẢN</label>
+                            <div class="d-flex align-items-center p-3 bg-light rounded-3 border border-dashed">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                        <i class="bi bi-person text-white fs-5"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-0 fw-bold">@Model.FullName</h6>
+                                    <small class="text-muted">CCCD: @(string.IsNullOrEmpty(Model.CCCD) ? "Chưa cập nhật" : Model.CCCD)</small>
+                                </div>
+                                <div>
+                                    @if (Model.IsKycVerified)
+                                    {
+                                        <span class="badge bg-success">Đã xác thực</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">Chờ xác thực</span>
+                                    }
+                                </div>
+                            </div>
                         </div>
-                    }
+
+                        <form asp-action="UploadCCCD" asp-controller="Profile" method="post" enctype="multipart/form-data">
+                            <label class="form-label fw-bold text-secondary small text-uppercase">Tải lên mặt trước CCCD</label>
+
+                            <div class="upload-zone mb-4" id="drop-zone">
+                                <input type="file" name="cccdImage" id="file-input" class="d-none" accept="image/*" required />
+                                <div class="text-center p-5 border-2 border-dashed rounded-4 bg-light cursor-pointer hover-bg-white transition-all shadow-inner" id="upload-content">
+                                    <i class="bi bi-cloud-arrow-up-fill text-primary display-4 mb-3"></i>
+                                    <p class="mb-1 fw-bold">Nhấp để tải lên hoặc kéo thả</p>
+                                    <p class="text-muted small">PNG, JPG hoặc JPEG (Tối đa 5MB)</p>
+                                </div>
+                                <div id="preview-container" class="mt-3 text-center d-none">
+                                    <div class="position-relative d-inline-block">
+                                        <img id="image-preview" src="#" alt="Preview" class="img-fluid rounded-4 shadow-sm border" style="max-height: 250px;" />
+                                        <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2 rounded-circle shadow" id="remove-img">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg w-100 py-3 rounded-pill fw-bold shadow-sm hover-lift mb-3">
+                                <i class="bi bi-shield-lock-fill me-2"></i> GỬI YÊU CẦU XÁC THỰC
+                            </button>
+
+                            <a asp-area="Identity" asp-page="/Account/Manage/Index" class="btn btn-link w-100 text-muted text-decoration-none small">
+                                <i class="bi bi-arrow-left"></i> Quay lại hồ sơ
+                            </a>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .border-dashed {
+        border-style: dashed !important;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    .hover-bg-white:hover {
+        background-color: #fff !important;
+        border-color: #0d6efd !important;
+    }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(13, 110, 253, 0.2) !important;
+    }
+
+    .shadow-inner {
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .upload-zone:hover .bi-cloud-arrow-up-fill {
+        transform: scale(1.1);
+        transition: transform 0.3s ease;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const uploadContent = document.getElementById('upload-content');
+        const previewContainer = document.getElementById('preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const removeImg = document.getElementById('remove-img');
+
+        // Click vào zone để chọn file
+        uploadContent.addEventListener('click', () => fileInput.click());
+
+        // Hiển thị ảnh khi chọn file
+        fileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    previewContainer.classList.remove('d-none');
+                    uploadContent.classList.add('d-none');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Xóa ảnh đã chọn
+        removeImg.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fileInput.value = '';
+            previewContainer.classList.add('d-none');
+            uploadContent.classList.remove('d-none');
+        });
+
+        // Hiệu ứng kéo thả
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadContent.classList.add('border-primary');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            uploadContent.classList.remove('border-primary');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadContent.classList.remove('border-primary');
+            fileInput.files = e.dataTransfer.files;
+            fileInput.dispatchEvent(new Event('change'));
+        });
+    </script>
+}

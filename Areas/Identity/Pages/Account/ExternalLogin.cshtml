@@ -1,0 +1,80 @@
+﻿@page
+@model ExternalLoginModel
+@{
+    ViewData["Title"] = "Hoàn tất đăng ký";
+}
+
+<div class="container py-5 mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <!-- Header chuyên nghiệp -->
+                <div class="bg-primary py-4 text-center">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle shadow mb-3" style="width: 80px; height: 80px;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" style="width: 40px;">
+                    </div>
+                    <h3 class="text-white fw-bold mb-0">Hoàn tất liên kết</h3>
+                    <p class="text-white-50 small px-4">Tài khoản Google của bạn đã được xác thực thành công</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <div class="alert alert-info border-0 rounded-4 mb-4 small d-flex align-items-center">
+                        <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+                        <span>
+                            Bạn đã xác thực với <strong>@Model.ProviderDisplayName</strong>.
+                            Vui lòng hoàn thiện các thông tin bên dưới để tạo hồ sơ vay tại FastLoan.
+                        </span>
+                    </div>
+
+                    <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+                        <!-- Email (Read only) -->
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Email" class="form-control rounded-3 bg-light border-0" autocomplete="email" readonly />
+                            <label asp-for="Input.Email" class="text-muted fw-bold">Địa chỉ Email</label>
+                            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Họ và tên (Tự lấy từ Google) -->
+                        <div class="form-floating mb-3 shadow-sm">
+                            <input asp-for="Input.FullName" class="form-control rounded-3 border-0" placeholder="Họ và tên" />
+                            <label asp-for="Input.FullName">Họ và tên của bạn <span class="text-danger">*</span></label>
+                            <span asp-validation-for="Input.FullName" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Số điện thoại (Bắt buộc nhập mới) -->
+                        <div class="form-floating mb-4 shadow-sm">
+                            <input asp-for="Input.PhoneNumber" class="form-control rounded-3 border-0" placeholder="Số điện thoại" />
+                            <label asp-for="Input.PhoneNumber">Số điện thoại liên hệ <span class="text-danger">*</span></label>
+                            <span asp-validation-for="Input.PhoneNumber" class="text-danger small"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow transition-all hover-lift">
+                            XÁC NHẬN VÀ BẮT ĐẦU VAY
+                        </button>
+                    </form>
+                </div>
+
+                <div class="card-footer bg-light border-0 py-3 text-center">
+                    <p class="mb-0 small text-muted">Bảo mật thông tin là ưu tiên hàng đầu của FastLoan</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-lift:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(13, 110, 253, 0.15) !important;
+    }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

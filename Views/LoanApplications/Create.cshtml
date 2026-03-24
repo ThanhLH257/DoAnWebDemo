@@ -1,50 +1,290 @@
 ﻿@model DoAnWebDemo.Models.LoanApplication
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Thiết lập khoản vay";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Create</h1>
-
-<h4>LoanApplication</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <div class="form-group">
-                <label asp-for="PackageId" class="control-label"></label>
-                <select asp-for="PackageId" class ="form-control" asp-items="ViewBag.PackageId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="LoanAmount" class="control-label"></label>
-                <input asp-for="LoanAmount" class="form-control" />
-                <span asp-validation-for="LoanAmount" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TermMonths" class="control-label"></label>
-                <input asp-for="TermMonths" class="form-control" />
-                <span asp-validation-for="TermMonths" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Purpose" class="control-label"></label>
-                <input asp-for="Purpose" class="form-control" />
-                <span asp-validation-for="Purpose" class="text-danger"></span>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-10">
+            <!-- Header tinh tế & Gọn gàng -->
+            <div class="text-center mb-4 animate-fade-in">
+                <h2 class="fw-black text-dark mb-1">Đăng Ký Khoản Vay</h2>
+                <p class="text-secondary small text-uppercase ls-2">Xác thực hồ sơ & Giải ngân siêu tốc</p>
             </div>
 
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+            <div class="card border-0 shadow-2xl rounded-5 bg-white overflow-hidden main-loan-card">
+                <div class="row g-0">
+                    <!-- Phân hệ Nhập liệu -->
+                    <div class="col-md-7 p-4 p-lg-5">
+                        <form asp-action="Create" id="loanForm">
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 rounded-4 x-small mb-4 shadow-sm"></div>
+
+                            <!-- Bước 1: Chọn gói -->
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="step-num me-2">1</span>
+                                    <label class="form-label fw-bold text-dark small m-0 text-uppercase">Chọn gói sản phẩm</label>
+                                </div>
+                                <div class="form-floating custom-floating shadow-sm rounded-4 overflow-hidden border">
+                                    <select asp-for="PackageId" id="packageSelect" class="form-select border-0 bg-white fw-bold text-primary" asp-items="ViewBag.PackageId">
+                                        <option value="" disabled selected>Vui lòng chọn gói vay...</option>
+                                    </select>
+                                    <label asp-for="PackageId">Danh sách gói vay ưu đãi</label>
+                                </div>
+                                <span asp-validation-for="PackageId" class="text-danger x-small mt-1 d-block ms-2"></span>
+                            </div>
+
+                            <!-- Bước 2: Số tiền & Kỳ hạn -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-7">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <span class="step-num me-2">2</span>
+                                        <label class="form-label fw-bold text-dark small m-0 text-uppercase">Số tiền cần vay</label>
+                                    </div>
+                                    <div class="form-floating custom-floating shadow-sm rounded-4 overflow-hidden border">
+                                        <input asp-for="LoanAmount" class="form-control border-0 bg-white fw-black text-danger h-auto" style="font-size: 1.25rem;" placeholder="10.000.000" />
+                                        <label asp-for="LoanAmount">VNĐ</label>
+                                    </div>
+                                    <span asp-validation-for="LoanAmount" class="text-danger x-small mt-1 d-block ms-2"></span>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <span class="step-num me-2">3</span>
+                                        <label class="form-label fw-bold text-dark small m-0 text-uppercase">Kỳ hạn</label>
+                                    </div>
+                                    <div class="form-floating custom-floating shadow-sm rounded-4 overflow-hidden border">
+                                        <input asp-for="TermMonths" class="form-control border-0 bg-white fw-bold h-auto" style="font-size: 1.25rem;" placeholder="12" />
+                                        <label asp-for="TermMonths">Tháng</label>
+                                    </div>
+                                    <span asp-validation-for="TermMonths" class="text-danger x-small mt-1 d-block ms-2"></span>
+                                </div>
+                            </div>
+
+                            <!-- Bước 4: Mục đích -->
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="step-num me-2">4</span>
+                                    <label class="form-label fw-bold text-dark small m-0 text-uppercase">Mục đích sử dụng vốn</label>
+                                </div>
+                                <div class="form-floating custom-floating shadow-sm rounded-4 overflow-hidden border">
+                                    <textarea asp-for="Purpose" class="form-control border-0 bg-white" style="height: 100px" placeholder="Lý do"></textarea>
+                                    <label asp-for="Purpose">Mô tả ngắn gọn mục đích vay</label>
+                                </div>
+                                <span asp-validation-for="Purpose" class="text-danger x-small mt-1 d-block ms-2"></span>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-black py-3 shadow-blue hover-lift transition-all mt-2">
+                                GỬI HỒ SƠ THẨM ĐỊNH <i class="bi bi-send-check-fill ms-2"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Phân hệ Tóm tắt (FIXED: Không bao giờ mất chữ) -->
+                    <div class="col-md-5 p-4 p-lg-5 d-flex flex-column justify-content-center border-start border-white" style="background-color: #f8faff;">
+                        <div id="emptyHint" class="text-center py-5 opacity-50">
+                            <i class="bi bi-clipboard-check fs-1 mb-3 d-block text-primary"></i>
+                            <p class="small fw-bold">Chi tiết khoản vay sẽ hiển thị khi bạn chọn gói sản phẩm</p>
+                        </div>
+
+                        <div id="livePreview" class="d-none animate-slide-in">
+                            <div class="bg-white rounded-5 shadow-sm p-4 border border-light position-relative overflow-hidden">
+                                <div class="text-center mb-4 pb-3 border-bottom border-light">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-1 mb-2 fw-bold" id="pName">Gói vay</span>
+                                    <div class="display-5 fw-black text-dark mb-0"><span id="pRate">0</span><small class="fs-5">%</small></div>
+                                    <small class="text-muted text-uppercase ls-1 fw-bold" style="font-size: 0.65rem;">Lãi suất hàng tháng</small>
+                                </div>
+
+                                <div class="info-list mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="text-secondary small fw-medium">Hạn mức tối đa</span>
+                                        <span class="fw-bold text-dark" id="pMax">0 đ</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="text-secondary small fw-medium">Kỳ hạn tối đa</span>
+                                        <span class="fw-bold text-dark"><span id="pTerm">0</span> tháng</span>
+                                    </div>
+
+                                    <!-- HỘP HIỂN THỊ TIỀN TRẢ GÓP - FIX TRIỆT ĐỂ LỖI ĐÈ MÀU -->
+                                    <div class="p-3 rounded-4 mt-3" style="background-color: #fff5f5; border: 1px solid #feb2b2;">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span style="color: #c53030; font-size: 0.85rem; font-weight: 700;">TRẢ GÓP DỰ KIẾN</span>
+                                            <span id="pMonthly" style="color: #c53030; font-weight: 900; font-size: 1.25rem;">0 đ</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- PHẦN BẢO MẬT - TỐI ƯU TƯƠNG PHẢN -->
+                                <div class="p-3 rounded-4" style="background-color: #ebf8ff; border: 1px solid #bee3f8;">
+                                    <div class="d-flex align-items-start">
+                                        <i class="bi bi-shield-lock-fill me-2" style="color: #2b6cb0; font-size: 1.2rem;"></i>
+                                        <div style="color: #2c5282; font-size: 0.72rem; line-height: 1.4;">
+                                            <strong style="color: #2a4365;">Bảo mật 256-bit:</strong> Hồ sơ của bạn được mã hóa và thẩm định bởi AI theo tiêu chuẩn quốc tế.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <a asp-action="Index" class="text-muted text-decoration-none small fw-bold hover-primary">
+                                    <i class="bi bi-arrow-left"></i> Quay lại danh sách đơn vay
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+<style>
+    .fw-black {
+        font-weight: 900;
+    }
+
+    .ls-1 {
+        letter-spacing: 1px;
+    }
+
+    .ls-2 {
+        letter-spacing: 2px;
+    }
+
+    .x-small {
+        font-size: 0.72rem;
+    }
+
+    .shadow-2xl {
+        box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.1);
+    }
+
+    .step-num {
+        width: 22px;
+        height: 22px;
+        background: #0d6efd;
+        color: white;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 900;
+    }
+
+    .main-loan-card {
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .custom-floating > .form-control, .custom-floating > .form-select {
+        height: 3.5rem;
+        padding-top: 1.5rem;
+        border-radius: 12px;
+    }
+
+    .custom-floating > label {
+        padding: 1rem 0.75rem;
+        font-weight: 600;
+        opacity: 0.5;
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-slide-in {
+        animation: slideIn 0.4s ease-out;
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(13, 110, 253, 0.2) !important;
+    }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+
+    .space-y-3 > * + * {
+        margin-top: 0.75rem;
+    }
+</style>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const packageSelect = document.getElementById('packageSelect');
+            const amountInput = document.getElementById('LoanAmount');
+            const termInput = document.getElementById('TermMonths');
+
+            const livePreview = document.getElementById('livePreview');
+            const emptyHint = document.getElementById('emptyHint');
+
+            // Xử lý nạp dữ liệu an toàn từ Razor sang JavaScript
+            const packagesDataRaw = '@Html.Raw(Json.Serialize(ViewBag.PackageData ?? new Dictionary<string, object>()))';
+            let packages = {};
+
+            try {
+                packages = JSON.parse(packagesDataRaw);
+            } catch (e) {
+                console.warn("Dữ liệu gói vay không khả dụng.");
+            }
+
+            function updateUI() {
+                const id = packageSelect.value;
+                if (id && packages && packages[id]) {
+                    const data = packages[id];
+                    document.getElementById('pName').innerText = data.name || "Gói vay";
+                    document.getElementById('pRate').innerText = data.rate || 0;
+                    document.getElementById('pMax').innerText = (data.max || 0).toLocaleString('vi-VN') + ' đ';
+                    document.getElementById('pTerm').innerText = data.term || 0;
+
+                    // Tính toán trả góp hàng tháng
+                    const amount = parseFloat(amountInput.value) || 0;
+                    const months = parseInt(termInput.value) || data.term || 1;
+                    const r = ((data.rate || 0) / 100);
+
+                    if(amount > 0 && months > 0) {
+                        const emi = (amount * r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1);
+                        document.getElementById('pMonthly').innerText = Math.round(emi).toLocaleString('vi-VN') + ' đ';
+                    } else {
+                        document.getElementById('pMonthly').innerText = '0 đ';
+                    }
+
+                    if(livePreview) livePreview.classList.remove('d-none');
+                    if(emptyHint) emptyHint.classList.add('d-none');
+                }
+            }
+
+            if (packageSelect) packageSelect.addEventListener('change', updateUI);
+            if (amountInput) amountInput.addEventListener('input', updateUI);
+            if (termInput) termInput.addEventListener('input', updateUI);
+        });
+    </script>
 }
