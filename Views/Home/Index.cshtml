@@ -1,228 +1,482 @@
 ﻿@{
-    ViewData["Title"] = "FastLoan - Vay vốn siêu tốc";
+    ViewData["Title"] = "FastLoan - Giải Pháp Tài Chính Số";
+    var popularPackages = ViewBag.PopularPackages as IEnumerable<DoAnWebDemo.Models.LoanPackage>;
 }
 
-<!-- Banner Hero Section (Có hình ảnh) -->
-<div class="py-5 mb-5 bg-white rounded-4 shadow-sm border overflow-hidden" style="background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);">
-    <div class="container-fluid px-5">
+<!-- === 1. HERO SECTION === -->
+<div class="hero-wrapper mb-5 overflow-hidden border-bottom">
+    <div class="container px-4 px-lg-5 py-4 py-lg-5">
         <div class="row align-items-center">
-            <!-- Cột chữ -->
-            <div class="col-lg-6 mb-5 mb-lg-0 text-center text-lg-start">
-                <span class="badge bg-primary bg-opacity-10 text-primary mb-3 px-3 py-2 rounded-pill fw-bold">
-                    <i class="bi bi-star-fill text-warning me-1"></i> Nền tảng vay vốn hàng đầu 2026
-                </span>
-                <h1 class="display-4 fw-extrabold text-dark mb-4" style="font-weight: 800;">
-                    Giải pháp tài chính <br />
-                    <span class="text-primary">Nhanh chóng & An toàn</span>
+            <div class="col-lg-6 text-center text-lg-start animate-fade-up">
+                <div class="d-inline-flex align-items-center bg-white shadow-sm border rounded-pill px-3 py-1 mb-4">
+                    <span class="badge bg-primary rounded-pill me-2">AI 4.0</span>
+                    <small class="text-secondary fw-bold">Hệ thống phê duyệt tự động 24/7</small>
+                </div>
+                <h1 class="display-4 fw-black text-dark mb-4 ls-tight">
+                    Vay vốn thông minh <br />
+                    <span class="text-gradient">Giải ngân tức thì</span>
                 </h1>
-                <p class="fs-5 text-secondary mb-5 pe-lg-5">
-                    Đăng ký vay tiền online mọi lúc, mọi nơi. Thủ tục eKYC đơn giản, không cần thế chấp, duyệt tự động bằng công nghệ AI và giải ngân thần tốc trong vòng 24 giờ.
+                <p class="fs-6 text-secondary mb-4 pe-lg-5 opacity-75">
+                    FastLoan đồng hành cùng bạn giải quyết khó khăn tài chính với quy trình 100% online, an toàn và bảo mật thông tin tuyệt đối.
                 </p>
 
                 <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-lg-start gap-3">
                     @if (!User.Identity.IsAuthenticated)
                     {
-                        <a href="/Identity/Account/Register" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow fw-bold">
-                            Đăng Ký Vay Ngay <i class="bi bi-arrow-right ms-2"></i>
+                        <a href="javascript:void(0)" class="btn btn-primary px-5 py-3 rounded-pill shadow-blue fw-bold btn-guest-trigger">
+                            BẮT ĐẦU NGAY <i class="bi bi-chevron-right ms-2"></i>
                         </a>
                     }
                     else
                     {
-                        <a asp-controller="LoanApplications" asp-action="Create" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow fw-bold">
-                            Tạo Đơn Vay Mới <i class="bi bi-pencil-square ms-2"></i>
+                        <a asp-controller="LoanApplications" asp-action="Create" class="btn btn-primary px-5 py-3 rounded-pill shadow-blue fw-bold">
+                            TẠO ĐƠN VAY <i class="bi bi-plus-lg ms-2"></i>
                         </a>
                     }
-                    <a href="#calculator-section" class="btn btn-outline-secondary btn-lg px-5 py-3 rounded-pill fw-bold bg-white">
-                        Tính toán khoản vay
+                    <a href="#calculator-section" class="btn btn-white px-5 py-3 rounded-pill shadow-sm fw-bold border">
+                        TÍNH LÃI SUẤT
                     </a>
                 </div>
+            </div>
 
-                <div class="d-flex align-items-center justify-content-center justify-content-lg-start mt-4 text-muted font-monospace small">
-                    <div class="me-4"><i class="bi bi-check-circle-fill text-success me-1"></i> Duyệt hồ sơ 5p</div>
-                    <div><i class="bi bi-check-circle-fill text-success me-1"></i> 100% Online</div>
+            <div class="col-lg-6 text-center mt-5 mt-lg-0">
+                <div class="hero-image-container animate-float">
+                    <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
+                         alt="Giao diện FastLoan"
+                         class="img-fluid rounded-5 shadow-2xl main-hero-img border-white border-8" style="max-width: 80%;">
                 </div>
             </div>
+        </div>
+    </div>
+</div>
 
-            <!-- Cột hình ảnh -->
-            <div class="col-lg-6 text-center">
-                <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                     alt=""
-                     class="img-fluid rounded-4 shadow-lg border" style="transform: perspective(1000px) rotateY(-5deg); transition: transform 0.3s;" onmouseover="this.style.transform='perspective(1000px) rotateY(0deg)'" onmouseout="this.style.transform='perspective(1000px) rotateY(-5deg)'">
+<!-- === 2. QUICK STATS === -->
+<div class="container mb-5 mt-n5 position-relative" style="z-index: 3;">
+    <div class="row g-3 justify-content-center">
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 text-center glass-bg">
+                <div class="h3 fw-black text-primary mb-1">50K+</div>
+                <small class="text-muted text-uppercase ls-1 x-small">Khách hàng</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 text-center glass-bg">
+                <div class="h3 fw-black text-success mb-1">99.9%</div>
+                <small class="text-muted text-uppercase ls-1 x-small">Hài lòng</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 text-center glass-bg">
+                <div class="h3 fw-black text-warning mb-1">24/7</div>
+                <small class="text-muted text-uppercase ls-1 x-small">Hỗ trợ</small>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Thống kê (Numbers Section) -->
-<div class="container mb-5">
-    <div class="row text-center g-4">
-        <div class="col-md-4">
-            <div class="p-4 bg-white rounded-4 shadow-sm border border-light">
-                <h2 class="display-5 fw-bold text-primary mb-0">50,000+</h2>
-                <p class="text-muted fw-semibold mt-2">Khách hàng tin dùng</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="p-4 bg-white rounded-4 shadow-sm border border-light">
-                <h2 class="display-5 fw-bold text-success mb-0">500 Tỷ</h2>
-                <p class="text-muted fw-semibold mt-2">Đã được giải ngân</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="p-4 bg-white rounded-4 shadow-sm border border-light">
-                <h2 class="display-5 fw-bold text-warning mb-0">98%</h2>
-                <p class="text-muted fw-semibold mt-2">Tỷ lệ hài lòng</p>
-            </div>
-        </div>
+<!-- === 3. LOAN PACKAGES (THIẾT KẾ THU GỌN) === -->
+<div id="packages-section" class="container py-5 scroll-mt">
+    <div class="text-center max-w-700 mx-auto mb-4">
+        <h6 class="text-primary fw-bold text-uppercase mb-2 ls-2 small">Sản phẩm vay</h6>
+        <h3 class="fw-black text-dark">Lựa chọn phù hợp nhất</h3>
+        <p class="text-secondary opacity-75 small">Các gói vay được tối ưu hóa cho từng nhu cầu cụ thể của bạn.</p>
     </div>
-</div>
 
-<!-- Tính năng F3: Công cụ dự toán khoản vay (Loan Calculator) -->
-<div id="calculator-section" class="row justify-content-center mb-5">
-    <div class="col-md-8">
-        <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
-            <div class="card-header bg-success text-white text-center py-4">
-                <h3 class="mb-0 fw-bold"><i class="bi bi-calculator"></i> Công cụ dự toán khoản vay</h3>
-                <p class="mb-0 text-white-50">Lãi suất minh bạch - Cố định 1.5%/tháng</p>
-            </div>
-            <div class="card-body p-5 bg-white">
+    <div class="row g-4 align-items-stretch justify-content-center">
+        @if (popularPackages != null && popularPackages.Any())
+        {
+            int count = 0;
+            @foreach (var package in popularPackages)
+            {
+                count++;
+                bool isFeatured = count == 2;
+                <div class="col-md-6 col-lg-4 px-xl-4">
+                    <div class="card h-100 border-0 rounded-5 package-card @(isFeatured ? "featured-package shadow-2xl" : "shadow-lg")">
+                        @if (isFeatured)
+                        {
+                            <div class="featured-ribbon">PHỔ BIẾN</div>
+                        }
 
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Số tiền muốn vay: <span id="amountLabel" class="text-primary fs-3">10,000,000 đ</span></label>
-                    <input type="range" class="form-range" id="loanAmount" min="1000000" max="100000000" step="1000000" value="10000000">
-                    <div class="d-flex justify-content-between text-muted small fw-bold">
-                        <span>1 Triệu</span>
-                        <span>100 Triệu</span>
+                        <div class="card-header border-0 py-4 text-center bg-transparent">
+                            <div class="icon-circle-sm mb-3 mx-auto @(count == 1 ? "bg-blue" : (count == 2 ? "bg-gold" : "bg-teal"))">
+                                <i class="bi @(count == 1 ? "bi-mortarboard" : (count == 2 ? "bi-lightning-charge" : "bi-bicycle")) fs-4 text-white"></i>
+                            </div>
+                            <h5 class="fw-black mb-0 text-dark">@package.PackageName</h5>
+                        </div>
+
+                        <div class="card-body px-4 py-3">
+                            <div class="text-center mb-3 pb-3 border-bottom border-light">
+                                <div class="h2 fw-black text-dark mb-0">@package.InterestRate%</div>
+                                <div class="text-muted x-small">lãi suất hàng tháng</div>
+                            </div>
+
+                            <ul class="list-unstyled mb-4 small space-y-2">
+                                <li class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    <span>Tối đa: <strong>@package.MaxAmount.ToString("#,##0")đ</strong></span>
+                                </li>
+                                <li class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    <span>Kỳ hạn: <strong>@package.DefaultTermMonths tháng</strong></span>
+                                </li>
+                                <li class="d-flex align-items-center">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    <span>Phê duyệt eKYC tự động</span>
+                                </li>
+                            </ul>
+
+                            @if (!User.Identity.IsAuthenticated)
+                            {
+                                <button class="btn w-100 rounded-pill fw-bold py-2 btn-guest-trigger @(isFeatured ? "btn-warning text-dark" : "btn-outline-primary")">CHỌN GÓI VAY</button>
+                            }
+                            else
+                            {
+                                <a asp-controller="LoanApplications" asp-action="Create" asp-route-packageId="@package.Id"
+                                   class="btn w-100 rounded-pill fw-bold py-2 @(isFeatured ? "btn-warning text-dark shadow-sm" : "btn-outline-primary")">CHỌN GÓI VAY</a>
+                            }
+                        </div>
                     </div>
                 </div>
+            }
+        }
+    </div>
+</div>
 
-                <div class="mb-5">
-                    <label class="form-label fw-bold">Kỳ hạn vay: <span id="termLabel" class="text-primary fs-3">6 Tháng</span></label>
-                    <input type="range" class="form-range" id="loanTerm" min="1" max="36" step="1" value="6">
-                    <div class="d-flex justify-content-between text-muted small fw-bold">
-                        <span>1 Tháng</span>
-                        <span>36 Tháng</span>
+<!-- === 4. DỰ TOÁN KHOẢN VAY (NỔI BẬT & HIỆN ĐẠI) === -->
+<div id="calculator-section" class="container-fluid py-5 my-5 scroll-mt bg-primary-dark">
+    <div class="container py-lg-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-11">
+                <div class="card border-0 rounded-5 shadow-2xl overflow-hidden calc-premium-card">
+                    <div class="row g-0">
+                        <!-- Cột điều khiển -->
+                        <div class="col-md-6 p-4 p-lg-5 bg-white">
+                            <h4 class="fw-black mb-1 text-dark">Dự toán khoản vay</h4>
+                            <p class="text-muted small mb-5">Điều chỉnh để tìm khoản vay phù hợp</p>
+
+                            <div class="mb-5">
+                                <div class="d-flex justify-content-between mb-3 align-items-end">
+                                    <label class="fw-bold text-secondary small text-uppercase">Số tiền vay</label>
+                                    <span id="amountLabel" class="fw-black text-primary h4 mb-0">10,000,000 đ</span>
+                                </div>
+                                <input type="range" class="form-range premium-slider" id="loanAmount" min="1000000" max="100000000" step="1000000" value="10000000">
+                                <div class="d-flex justify-content-between mt-2 x-small fw-bold text-muted">
+                                    <span>1 TRIỆU</span>
+                                    <span>100 TRIỆU</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between mb-3 align-items-end">
+                                    <label class="fw-bold text-secondary small text-uppercase">Kỳ hạn trả (tháng)</label>
+                                    <span id="termLabel" class="fw-black text-primary h4 mb-0">6 Tháng</span>
+                                </div>
+                                <input type="range" class="form-range premium-slider" id="loanTerm" min="1" max="36" step="1" value="6">
+                                <div class="d-flex justify-content-between mt-2 x-small fw-bold text-muted">
+                                    <span>1 THÁNG</span>
+                                    <span>36 THÁNG</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cột kết quả -->
+                        <div class="col-md-6 bg-dark p-4 p-lg-5 text-white d-flex flex-column justify-content-center text-center position-relative overflow-hidden">
+                            <div class="position-absolute top-0 end-0 p-3 opacity-10"><i class="bi bi-wallet2 display-1"></i></div>
+
+                            <h6 class="text-primary-light fw-bold text-uppercase ls-2 mb-3">Ước tính trả góp hàng tháng</h6>
+                            <h1 class="display-3 fw-black text-white mb-4" id="monthlyPayment">1,755,252 đ</h1>
+
+                            <p class="small text-white-50 mb-5 px-lg-4">Dựa trên lãi suất cố định 1.5%/tháng. Kết quả thực tế sẽ dựa trên hồ sơ tín dụng cá nhân của bạn.</p>
+
+                            <div class="px-lg-5">
+                                @if (!User.Identity.IsAuthenticated)
+                                {
+                                    <button class="btn btn-primary btn-lg w-100 rounded-pill fw-bold py-3 shadow-lg btn-guest-trigger">ĐĂNG KÝ VAY NGAY</button>
+                                }
+                                else
+                                {
+                                    <a asp-controller="LoanApplications" asp-action="Create" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold py-3 shadow-lg">ĐĂNG KÝ VAY NGAY</a>
+                                }
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-                <div class="p-4 rounded-4 text-center border" style="background-color: #f8f9fa;">
-                    <h5 class="text-muted mb-2">Số tiền ước tính phải trả mỗi tháng:</h5>
-                    <h1 class="text-danger fw-extrabold display-5 mb-0" id="monthlyPayment">1,755,252 đ</h1>
-                    <p class="text-muted small mt-2 mb-0"><i class="bi bi-info-circle"></i> Tính toán dựa trên công thức dư nợ giảm dần (EMI)</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Ưu điểm vượt trội (Features) -->
-<div class="container py-5 mb-5 border-top">
-    <div class="text-center mb-5">
-        <h2 class="fw-bold text-dark">Tại sao nên chọn FastLoan?</h2>
-        <p class="text-muted">Mang đến trải nghiệm tài chính vượt trội so với ngân hàng truyền thống</p>
+<!-- === 5. BENEFITS (ƯU ĐIỂM - ĐÃ GẮN ID) === -->
+<div id="benefits" class="container py-5 scroll-mt mt-4">
+    <div class="text-center max-w-700 mx-auto mb-5">
+        <h6 class="text-primary fw-bold text-uppercase mb-2 ls-2 small">Tại sao chọn FastLoan?</h6>
+        <h3 class="fw-black text-dark">Lợi ích vượt trội cho bạn</h3>
     </div>
     <div class="row g-4">
         <div class="col-md-4 text-center">
-            <div class="p-4 bg-white rounded-4 shadow-sm h-100 border hover-shadow transition">
-                <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-4" style="width: 80px; height: 80px;">
-                    <i class="bi bi-lightning-charge-fill fs-1"></i>
+            <div class="p-4 bg-white rounded-5 shadow-sm h-100 border hover-lift transition">
+                <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-4 shadow-sm" style="width: 70px; height: 70px;">
+                    <i class="bi bi-lightning-charge-fill fs-2"></i>
                 </div>
-                <h4 class="fw-bold">Giải ngân siêu tốc</h4>
-                <p class="text-muted">Hệ thống AI xét duyệt hồ sơ hoàn toàn tự động, tiền chuyển thẳng vào tài khoản của bạn chỉ sau 15 phút.</p>
+                <h5 class="fw-bold">Giải ngân siêu tốc</h5>
+                <p class="text-muted small">Hệ thống AI tự động duyệt hồ sơ và chuyển khoản chỉ sau 15 phút làm việc.</p>
             </div>
         </div>
         <div class="col-md-4 text-center">
-            <div class="p-4 bg-white rounded-4 shadow-sm h-100 border hover-shadow transition">
-                <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-4" style="width: 80px; height: 80px;">
-                    <i class="bi bi-shield-check fs-1"></i>
+            <div class="p-4 bg-white rounded-5 shadow-sm h-100 border hover-lift transition">
+                <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-4 shadow-sm" style="width: 70px; height: 70px;">
+                    <i class="bi bi-shield-lock-fill fs-2"></i>
                 </div>
-                <h4 class="fw-bold">Bảo mật eKYC</h4>
-                <p class="text-muted">Dữ liệu cá nhân và hình ảnh CCCD được mã hóa chuẩn quốc tế. Cam kết tuyệt đối không chia sẻ cho bên thứ ba.</p>
+                <h5 class="fw-bold">Bảo mật chuẩn Ngân hàng</h5>
+                <p class="text-muted small">Dữ liệu cá nhân được mã hóa 256-bit, đảm bảo an toàn tuyệt đối cho người dùng.</p>
             </div>
         </div>
         <div class="col-md-4 text-center">
-            <div class="p-4 bg-white rounded-4 shadow-sm h-100 border hover-shadow transition">
-                <div class="d-inline-flex align-items-center justify-content-center bg-info bg-opacity-10 text-info rounded-circle mb-4" style="width: 80px; height: 80px;">
-                    <i class="bi bi-phone fs-1"></i>
+            <div class="p-4 bg-white rounded-5 shadow-sm h-100 border hover-lift transition">
+                <div class="d-inline-flex align-items-center justify-content-center bg-info bg-opacity-10 text-info rounded-circle mb-4 shadow-sm" style="width: 70px; height: 70px;">
+                    <i class="bi bi-phone-vibrate-fill fs-2"></i>
                 </div>
-                <h4 class="fw-bold">100% Online</h4>
-                <p class="text-muted">Không cần gặp mặt, không cần thế chấp tài sản, không giấy tờ rườm rà. Mọi thao tác đều thực hiện ngay trên Web.</p>
+                <h5 class="fw-bold">Tiện lợi 100% Online</h5>
+                <p class="text-muted small">Không cần gặp mặt, không cần thế chấp. Mọi thao tác thực hiện ngay trên điện thoại.</p>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Quy trình 3 bước (How it works) -->
-<div class="bg-dark text-white rounded-4 p-5 mb-5 shadow-lg">
-    <div class="text-center mb-5">
-        <h2 class="fw-bold">Quy trình vay cực kỳ đơn giản</h2>
-        <p class="text-white-50">Chỉ với 3 bước, bạn đã có thể nhận được khoản vay mong muốn</p>
+<!-- === 6. HOW IT WORKS (QUY TRÌNH - ĐÃ GẮN ID) === -->
+<div id="how-it-works" class="container-fluid bg-dark py-5 scroll-mt mt-5">
+    <div class="container py-4 text-white text-center">
+        <h2 class="fw-black text-uppercase ls-2 mb-5">3 Bước nhận tiền ngay</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="step-num-sm mb-3 mx-auto">01</div>
+                <h6 class="fw-bold">Đăng ký & eKYC</h6>
+                <p class="text-white-50 x-small px-4">Tải ảnh CCCD mặt trước để AI xác thực trong 30 giây.</p>
+            </div>
+            <div class="col-md-4">
+                <div class="step-num-sm mb-3 mx-auto">02</div>
+                <h6 class="fw-bold">Nộp đơn & Thẩm định</h6>
+                <p class="text-white-50 x-small px-4">Hệ thống AI tự động chấm điểm tín dụng của bạn.</p>
+            </div>
+            <div class="col-md-4">
+                <div class="step-num-sm mb-3 mx-auto">03</div>
+                <h6 class="fw-bold">Giải ngân 24/7</h6>
+                <p class="text-white-50 x-small px-4">Tiền đổ thẳng vào tài khoản ngân hàng bất kể ngày đêm.</p>
+            </div>
+        </div>
     </div>
-    <div class="row position-relative">
-        <div class="col-md-4 text-center position-relative mb-4 mb-md-0">
-            <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle mb-3 border border-4 border-dark" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: bold; z-index: 2; position: relative;">1</div>
-            <h5 class="fw-bold">Tạo tài khoản & eKYC</h5>
-            <p class="text-white-50 small px-3">Đăng ký và chụp ảnh CCCD để xác thực danh tính trực tuyến.</p>
-        </div>
-        <div class="col-md-4 text-center position-relative mb-4 mb-md-0">
-            <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle mb-3 border border-4 border-dark" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: bold; z-index: 2; position: relative;">2</div>
-            <h5 class="fw-bold">Chọn khoản vay</h5>
-            <p class="text-white-50 small px-3">Tùy chọn số tiền và kỳ hạn linh hoạt. Gửi đơn chờ AI thẩm định.</p>
-        </div>
-        <div class="col-md-4 text-center position-relative">
-            <div class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded-circle mb-3 border border-4 border-dark" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: bold; z-index: 2; position: relative;">3</div>
-            <h5 class="fw-bold">Nhận tiền ngay</h5>
-            <p class="text-white-50 small px-3">Sau khi được Admin duyệt, tiền sẽ đổ thẳng vào tài khoản của bạn.</p>
+</div>
+
+<!-- === 7. FINAL CTA === -->
+<div class="container py-5 my-5">
+    <div class="cta-banner rounded-5 p-4 p-lg-5 text-center text-white position-relative overflow-hidden shadow-2xl">
+        <div class="position-relative" style="z-index: 2;">
+            <h3 class="fw-black mb-3">Khởi đầu tương lai ngay hôm nay</h3>
+            <p class="small opacity-75 mb-4 px-lg-5">Gia nhập cộng đồng 50.000+ người dùng tin cậy của FastLoan.</p>
+            <div class="d-flex justify-content-center gap-2">
+                <a href="/Identity/Account/Register" class="btn btn-white px-4 py-2 rounded-pill fw-bold text-primary shadow-sm small">ĐĂNG KÝ MIỄN PHÍ</a>
+                <a href="tel:19008888" class="btn btn-outline-white px-4 py-2 rounded-pill fw-bold small">TƯ VẤN MIỄN PHÍ</a>
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    .hover-shadow:hover {
-        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+    :root {
+        --primary-blue: #0d6efd;
+        --primary-dark: #0a1931;
+        --gold: #ffc107;
+        --teal: #20c997;
+    }
+
+    .fw-black {
+        font-weight: 900;
+    }
+
+    .ls-1 {
+        letter-spacing: 1px;
+    }
+
+    .ls-2 {
+        letter-spacing: 2px;
+    }
+
+    .x-small {
+        font-size: 0.75rem;
+    }
+
+    .bg-primary-dark {
+        background-color: var(--primary-dark);
+    }
+
+    .text-primary-light {
+        color: #8eb9ff;
+    }
+
+    .text-gradient {
+        background: linear-gradient(90deg, #0d6efd, #6610f2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .shadow-blue {
+        box-shadow: 0 8px 25px rgba(13, 110, 253, 0.2);
+    }
+
+    .shadow-2xl {
+        box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .scroll-mt {
+        scroll-margin-top: 100px;
+    }
+
+    /* Packages */
+    .package-card {
+        transition: all 0.3s ease;
+        background: #fff;
+        border: 1px solid #f5f5f5 !important;
+    }
+
+        .package-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08) !important;
+        }
+
+    .featured-package {
+        border: 2px solid var(--gold) !important;
+        transform: scale(1.02);
+    }
+
+    .featured-ribbon {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #dc3545;
+        color: white;
+        padding: 3px 15px;
+        border-radius: 50px;
+        font-size: 0.65rem;
+        font-weight: 800;
+    }
+
+    /* Premium Calculator */
+    .calc-premium-card {
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .premium-slider {
+        height: 8px;
+        border-radius: 10px;
+        background: #e9ecef;
+    }
+
+        .premium-slider::-webkit-slider-thumb {
+            width: 24px;
+            height: 24px;
+            background: var(--primary-blue);
+            border: 4px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            cursor: pointer;
+            border-radius: 50%;
+            -webkit-appearance: none;
+        }
+
+    /* Steps & Icons */
+    .icon-circle-sm {
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+    }
+
+    .bg-blue {
+        background: #0d6efd;
+    }
+
+    .bg-gold {
+        background: #ffc107;
+    }
+
+    .bg-teal {
+        background: #20c997;
+    }
+
+    .step-num-sm {
+        width: 50px;
+        height: 50px;
+        border: 2px solid #3d4451;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        font-weight: 900;
+        color: var(--primary-blue);
+        background: #212529;
+    }
+
+    .cta-banner {
+        background: var(--primary-blue);
+    }
+
+    .hover-lift:hover {
         transform: translateY(-5px);
     }
 
-    .transition {
-        transition: all .3s ease-in-out;
+    .btn-white {
+        background: white;
+        color: var(--primary-blue);
     }
+
+    .btn-outline-white {
+        border: 2px solid white;
+        color: white;
+    }
+
+        .btn-outline-white:hover {
+            background: white;
+            color: var(--primary-blue);
+        }
 </style>
 
-<!-- Javascript xử lý kéo thanh trượt (Thuật toán EMI) -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // Xử lý nút khách
+        const guestTriggers = document.querySelectorAll('.btn-guest-trigger');
+        guestTriggers.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const modal = new bootstrap.Modal(document.getElementById('guestPromptModal'));
+                modal.show();
+            });
+        });
+
+        // Xử lý Calculator
         const amountSlider = document.getElementById('loanAmount');
         const termSlider = document.getElementById('loanTerm');
         const amountLabel = document.getElementById('amountLabel');
         const termLabel = document.getElementById('termLabel');
         const paymentResult = document.getElementById('monthlyPayment');
 
-        // Hàm tính toán EMI
-        function calculateEMI() {
+        function calculate() {
             let p = parseInt(amountSlider.value);
             let n = parseInt(termSlider.value);
-            let r = 0.015; // Lãi suất cố định 1.5%/tháng để Demo
+            let r = 0.015; // 1.5%/tháng
 
-            // Định dạng tiền tệ
             amountLabel.innerText = p.toLocaleString('vi-VN') + ' đ';
             termLabel.innerText = n + ' Tháng';
 
-            let emi = 0;
-            if (r > 0) {
-                let mathPower = Math.pow(1 + r, n);
-                emi = (p * r * mathPower) / (mathPower - 1);
-            } else {
-                emi = p / n;
-            }
-
+            // Công thức EMI (Dư nợ giảm dần)
+            let emi = (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
             paymentResult.innerText = Math.round(emi).toLocaleString('vi-VN') + ' đ';
         }
 
-        // Lắng nghe sự kiện kéo thanh trượt
-        amountSlider.addEventListener('input', calculateEMI);
-        termSlider.addEventListener('input', calculateEMI);
-
-        // Chạy lần đầu để hiển thị giá trị mặc định
-        calculateEMI();
+        amountSlider.addEventListener('input', calculate);
+        termSlider.addEventListener('input', calculate);
+        calculate();
     });
 </script>

@@ -24,157 +24,159 @@ namespace DoAnWebDemo.Controllers
             _userManager = userManager;
         }
 
-        // GET: LoanApplications
+        // GET: LoanApplications - Danh sách đơn vay
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.LoanApplications.Include(l => l.Package).Include(l => l.User);
-            return View(await applicationDbContext.ToListAsync());
+            if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+            {
+                var allLoans = _context.LoanApplications
+                    .Include(l => l.Package)
+                    .Include(l => l.User)
+                    .OrderByDescending(l => l.CreatedAt);
+                return View(await allLoans.ToListAsync());
+            }
+
+            var userId = _userManager.GetUserId(User);
+            var myLoans = _context.LoanApplications
+                .Include(l => l.Package)
+                .Where(l => l.UserId == userId)
+                .OrderByDescending(l => l.CreatedAt);
+
+            return View(await myLoans.ToListAsync());
         }
 
         // GET: LoanApplications/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var loanApplication = await _context.LoanApplications
                 .Include(l => l.Package)
                 .Include(l => l.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (loanApplication == null)
+
+            if (loanApplication == null) return NotFound();
+
+            if (!User.IsInRole("Admin") && loanApplication.UserId != _userManager.GetUserId(User))
             {
-                return NotFound();
+                return Forbid();
             }
 
             return View(loanApplication);
         }
 
-        // GET: LoanApplications/Create
-        public IActionResult Create()
+        // GET: LoanApplications/Create - Trang đăng ký (Thiết kế mới)
+        public async Task<IActionResult> Create()
         {
-            ViewData["PackageId"] = new SelectList(_context.LoanPackages, "Id", "PackageName");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null ||
+                string.IsNullOrEmpty(user.FullName) ||
+                string.IsNullOrEmpty(user.CCCD) ||
+                string.IsNullOrEmpty(user.Address) ||
+                user.MonthlyIncome <= 0 ||
+                user.IsKycVerified == false)
+            {
+                TempData["StatusMessage"] = "Error: Bạn cần hoàn thiện Họ tên, CCCD, Địa chỉ, Thu nhập và xác thực eKYC trước khi nộp đơn vay.";
+                return RedirectToPage("/Account/Manage/Index", new { area = "Identity" });
+            }
+
+            var packages = await _context.LoanPackages.ToListAsync();
+
+            // Cung cấp dữ liệu JSON để giao diện cập nhật ngay lập tức
+            ViewBag.PackageData = packages.ToDictionary(p => p.Id.ToString(), p => new {
+                name = p.PackageName,
+                rate = p.InterestRate,
+                min = p.MinAmount,
+                max = p.MaxAmount,
+                term = p.DefaultTermMonths
+            });
+
+            ViewData["PackageId"] = new SelectList(packages, "Id", "PackageName");
+
             return View();
         }
 
         // POST: LoanApplications/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("PackageId,LoanAmount,TermMonths,Purpose")] LoanApplication loanApplication)
         {
-            // 1. Tự động gán thông tin ngầm
-            loanApplication.UserId = _userManager.GetUserId(User); // Lấy ID người đang đăng nhập
-            loanApplication.Status = "Pending"; // Mặc định là chờ duyệt
-            loanApplication.CreditScore = 0; // Tạm thời bằng 0 (Sẽ làm ở F5)
-            loanApplication.CreatedAt = DateTime.Now;
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
 
-            // 2. Xóa lỗi xác thực của các trường mà ta vừa tự gán ngầm
             ModelState.Remove("UserId");
             ModelState.Remove("User");
             ModelState.Remove("Status");
 
             if (ModelState.IsValid)
             {
-                var user = await _userManager.GetUserAsync(User); // Lấy thông tin user
-
                 loanApplication.UserId = user.Id;
                 loanApplication.Status = "Pending";
                 loanApplication.CreatedAt = DateTime.Now;
 
-                // --- BẮT ĐẦU F5: THUẬT TOÁN CHẤM ĐIỂM ---
-                // Ví dụ: Cứ mỗi 1 triệu VNĐ thu nhập sẽ được cộng 5 điểm tín dụng. Trừ đi số tháng vay.
-                int calculatedScore = (int)(user.MonthlyIncome / 1000000) * 5 - loanApplication.TermMonths;
-                loanApplication.CreditScore = calculatedScore > 0 ? calculatedScore : 10; // Tối thiểu 10 điểm
-                                                                                          // --- KẾT THÚC F5 ---
+                // Thuật toán chấm điểm AI dựa trên thu nhập và kỳ hạn
+                int calculatedScore = (int)(user.MonthlyIncome / 1000000) * 10 - loanApplication.TermMonths;
+                if (calculatedScore < 10) calculatedScore = 10;
+                if (calculatedScore > 990) calculatedScore = 990;
+
+                loanApplication.CreditScore = calculatedScore;
 
                 _context.Add(loanApplication);
                 await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Hồ sơ vay đã được gửi thành công. AI đang thẩm định kết quả!";
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PackageId"] = new SelectList(_context.LoanPackages, "Id", "PackageName", loanApplication.PackageId);
+
+            // Nạp lại dữ liệu nếu có lỗi
+            var packages = await _context.LoanPackages.ToListAsync();
+            ViewBag.PackageData = packages.ToDictionary(p => p.Id.ToString(), p => new {
+                name = p.PackageName,
+                rate = p.InterestRate,
+                min = p.MinAmount,
+                max = p.MaxAmount,
+                term = p.DefaultTermMonths
+            });
+            ViewData["PackageId"] = new SelectList(packages, "Id", "PackageName", loanApplication.PackageId);
+
             return View(loanApplication);
         }
 
-        // GET: LoanApplications/Edit/5
+        // Các hàm hỗ trợ khác giữ nguyên logic cũ
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
+            if (id == null) return NotFound();
             var loanApplication = await _context.LoanApplications.FindAsync(id);
-            if (loanApplication == null)
-            {
-                return NotFound();
-            }
+            if (loanApplication == null) return NotFound();
+            if (!User.IsInRole("Admin") && loanApplication.Status != "Pending") return RedirectToAction(nameof(Details), new { id = loanApplication.Id });
             ViewData["PackageId"] = new SelectList(_context.LoanPackages, "Id", "PackageName", loanApplication.PackageId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", loanApplication.UserId);
             return View(loanApplication);
         }
 
-        // POST: LoanApplications/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,PackageId,LoanAmount,TermMonths,Purpose,CreditScore,Status,CreatedAt")] LoanApplication loanApplication)
         {
-            if (id != loanApplication.Id)
-            {
-                return NotFound();
-            }
-
+            if (id != loanApplication.Id) return NotFound();
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(loanApplication);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!LoanApplicationExists(loanApplication.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                try { _context.Update(loanApplication); await _context.SaveChangesAsync(); }
+                catch (DbUpdateConcurrencyException) { if (!LoanApplicationExists(loanApplication.Id)) return NotFound(); else throw; }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PackageId"] = new SelectList(_context.LoanPackages, "Id", "PackageName", loanApplication.PackageId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", loanApplication.UserId);
             return View(loanApplication);
         }
 
-        // GET: LoanApplications/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var loanApplication = await _context.LoanApplications
-                .Include(l => l.Package)
-                .Include(l => l.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (loanApplication == null)
-            {
-                return NotFound();
-            }
-
+            if (id == null) return NotFound();
+            var loanApplication = await _context.LoanApplications.Include(l => l.Package).Include(l => l.User).FirstOrDefaultAsync(m => m.Id == id);
+            if (loanApplication == null) return NotFound();
+            if (!User.IsInRole("Admin") && loanApplication.Status != "Pending") return RedirectToAction(nameof(Index));
             return View(loanApplication);
         }
 
-        // POST: LoanApplications/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -182,16 +184,13 @@ namespace DoAnWebDemo.Controllers
             var loanApplication = await _context.LoanApplications.FindAsync(id);
             if (loanApplication != null)
             {
+                if (!User.IsInRole("Admin") && loanApplication.Status != "Pending") return BadRequest("Không thể xóa hồ sơ.");
                 _context.LoanApplications.Remove(loanApplication);
+                await _context.SaveChangesAsync();
             }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool LoanApplicationExists(int id)
-        {
-            return _context.LoanApplications.Any(e => e.Id == id);
-        }
+        private bool LoanApplicationExists(int id) => _context.LoanApplications.Any(e => e.Id == id);
     }
 }

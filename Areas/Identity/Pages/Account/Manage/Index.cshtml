@@ -5,45 +5,116 @@
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
 
-<h4 class="fw-bold text-dark mb-4 text-uppercase" style="letter-spacing: 1px;">
-    <i class="bi bi-person-vcard-fill text-primary me-2"></i> @ViewData["Title"]
-</h4>
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+        <h4 class="fw-bold text-dark mb-0 text-uppercase" style="letter-spacing: 1px;">
+            <i class="bi bi-person-vcard-fill text-primary me-2"></i> @ViewData["Title"]
+        </h4>
+        <p class="text-muted small mb-0">Hoàn thiện thông tin để tăng hạn mức vay vốn</p>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+        @if (Model.Input.IsKycVerified)
+        {
+            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 border border-success border-opacity-25">
+                <i class="bi bi-patch-check-fill me-1"></i> Đã xác thực eKYC
+            </span>
+        }
+        else
+        {
+            <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2 border border-warning border-opacity-25">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i> Chờ xác thực
+            </span>
+            <a asp-area="" asp-controller="Profile" asp-action="Index" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm hover-lift">
+                <i class="bi bi-camera-fill me-1"></i> XÁC THỰC NGAY
+            </a>
+        }
+    </div>
+</div>
 
 <partial name="_StatusMessage" for="StatusMessage" />
 
 <div class="row">
-    <div class="col-md-8 col-xl-7">
+    <div class="col-md-12 col-xl-9">
         <form id="profile-form" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
 
-            <div class="bg-light p-4 rounded-4 mb-4 border border-white shadow-sm">
-                <!-- Username (Read only) -->
-                <div class="form-floating mb-3">
-                    <input asp-for="Username" class="form-control rounded-3 border-0 bg-white" placeholder="Tên đăng nhập" disabled />
-                    <label asp-for="Username" class="text-muted small fw-bold">Tên đăng nhập (Email)</label>
-                </div>
+            <div class="bg-light p-4 p-md-5 rounded-4 mb-4 border border-white shadow-sm">
+                <div class="row g-4">
+                    <!-- Username (Read only) -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input asp-for="Username" class="form-control rounded-3 border-0 bg-white" placeholder="Email" disabled />
+                            <label asp-for="Username" class="text-muted small fw-bold">Tài khoản (Email)</label>
+                        </div>
+                    </div>
 
-                <!-- Phone Number -->
-                <div class="form-floating mb-0">
-                    <input asp-for="Input.PhoneNumber" class="form-control rounded-3 border-0 bg-white" placeholder="Số điện thoại" />
-                    <label asp-for="Input.PhoneNumber" class="text-muted small fw-bold">Số điện thoại liên hệ</label>
-                    <span asp-validation-for="Input.PhoneNumber" class="text-danger small"></span>
+                    <!-- Họ và tên -->
+                    <div class="col-md-6">
+                        <div class="form-floating shadow-sm">
+                            <input asp-for="Input.FullName" class="form-control rounded-3 border-0 bg-white" placeholder="Họ tên" />
+                            <label asp-for="Input.FullName" class="text-muted small fw-bold">Họ và tên khách hàng</label>
+                            <span asp-validation-for="Input.FullName" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Số điện thoại -->
+                    <div class="col-md-6">
+                        <div class="form-floating shadow-sm">
+                            <input asp-for="Input.PhoneNumber" class="form-control rounded-3 border-0 bg-white" placeholder="SĐT" />
+                            <label asp-for="Input.PhoneNumber" class="text-muted small fw-bold">Số điện thoại liên hệ</label>
+                            <span asp-validation-for="Input.PhoneNumber" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Số CCCD -->
+                    <div class="col-md-6">
+                        <div class="form-floating shadow-sm">
+                            <input asp-for="Input.CCCD" class="form-control rounded-3 border-0 bg-white" placeholder="CCCD" />
+                            <label asp-for="Input.CCCD" class="text-muted small fw-bold">Số Căn cước công dân</label>
+                            <span asp-validation-for="Input.CCCD" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Thu nhập hàng tháng -->
+                    <div class="col-md-12">
+                        <div class="form-floating shadow-sm">
+                            <input asp-for="Input.MonthlyIncome" class="form-control rounded-3 border-0 bg-white fw-bold text-success" style="font-size: 1.2rem;" />
+                            <label asp-for="Input.MonthlyIncome" class="text-muted small fw-bold">Thu nhập hàng tháng (VNĐ)</label>
+                            <span asp-validation-for="Input.MonthlyIncome" class="text-danger small"></span>
+                        </div>
+                        <p class="small text-muted mt-2 ps-2"><i class="bi bi-info-circle"></i> Thu nhập là căn cứ quan trọng để AI chấm điểm hạn mức vay.</p>
+                    </div>
+
+                    <!-- Địa chỉ -->
+                    <div class="col-md-12">
+                        <div class="form-floating shadow-sm">
+                            <textarea asp-for="Input.Address" class="form-control rounded-3 border-0 bg-white" style="height: 100px" placeholder="Địa chỉ"></textarea>
+                            <label asp-for="Input.Address" class="text-muted small fw-bold">Địa chỉ thường trú</label>
+                            <span asp-validation-for="Input.Address" class="text-danger small"></span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <button id="update-profile-button" type="submit" class="btn btn-primary btn-lg w-100 py-3 rounded-pill fw-bold shadow-sm transition-all hover-lift">
-                <i class="bi bi-shield-check me-2"></i> CẬP NHẬT HỒ SƠ
+                <i class="bi bi-shield-check me-2"></i> LƯU THÔNG TIN HỒ SƠ
             </button>
         </form>
     </div>
 
     <!-- Cột thông tin phụ bên phải -->
-    <div class="col-md-4 d-none d-xl-block">
-        <div class="p-4 rounded-4" style="background-color: #f0f7ff; border: 1px dashed #0d6efd;">
-            <h6 class="fw-bold text-primary mb-3"><i class="bi bi-info-square-fill"></i> Thông tin hữu ích</h6>
-            <p class="small text-secondary lh-lg mb-0">
-                Việc giữ cho thông tin liên hệ chính xác giúp bạn nhận được các thông báo giải ngân và nhắc nợ quan trọng từ FastLoan nhanh chóng hơn.
-            </p>
+    <div class="col-xl-3 d-none d-xl-block">
+        <div class="p-4 rounded-4 bg-info bg-opacity-10 border border-info border-opacity-25 shadow-sm h-100">
+            <h6 class="fw-bold text-primary mb-3"><i class="bi bi-lightbulb-fill"></i> Tại sao cần thông tin này?</h6>
+            <ul class="small text-secondary ps-3 lh-lg">
+                <li><strong>Họ tên & CCCD:</strong> Để xác minh danh tính chủ khoản vay.</li>
+                <li><strong>Thu nhập:</strong> Giúp hệ thống tính toán hạn mức vay tối đa bạn có thể nhận.</li>
+                <li><strong>Địa chỉ:</strong> Cần thiết cho việc gửi hợp đồng và đối soát khu vực.</li>
+            </ul>
+            <div class="mt-4 p-3 bg-white rounded-3 small">
+                <i class="bi bi-lock-fill text-success"></i> Dữ liệu của bạn được mã hóa 256-bit an toàn tuyệt đối.
+            </div>
         </div>
     </div>
 </div>

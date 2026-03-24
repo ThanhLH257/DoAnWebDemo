@@ -1,70 +1,43 @@
 ﻿@model DoAnWebDemo.Models.LoanApplication
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Xóa đơn vay";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Delete</h1>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 text-center">
+            <div class="card border-0 shadow-2xl rounded-5 p-5 bg-white">
+                <div class="mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-danger bg-opacity-10 rounded-circle mb-4" style="width: 100px; height: 100px;">
+                        <i class="bi bi-exclamation-triangle-fill text-danger display-4"></i>
+                    </div>
+                    <h2 class="fw-black text-dark">Xác nhận xóa hồ sơ?</h2>
+                    <p class="text-secondary">Bạn đang thực hiện xóa đơn vay <strong>#@Model.Id</strong>. Hành động này không thể hoàn tác.</p>
+                </div>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>LoanApplication</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.User)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.User.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Package)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Package.PackageName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LoanAmount)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LoanAmount)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TermMonths)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TermMonths)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Purpose)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Purpose)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreditScore)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreditScore)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedAt)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+                <div class="p-4 bg-light rounded-4 mb-4 text-start">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Khoản vay:</span>
+                        <span class="fw-bold">@Model.Package?.PackageName</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted small">Số tiền:</span>
+                        <span class="fw-black text-danger">@Model.LoanAmount.ToString("#,##0") đ</span>
+                    </div>
+                </div>
+
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-grid gap-3">
+                        <button type="submit" class="btn btn-danger btn-lg py-3 rounded-pill fw-black shadow-sm hover-lift">
+                            XÓA VĨNH VIỄN HỒ SƠ
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary py-3 rounded-pill fw-bold border-0">GIỮ LẠI ĐƠN VAY</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>

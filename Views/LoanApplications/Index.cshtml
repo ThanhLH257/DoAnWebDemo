@@ -1,78 +1,157 @@
 ﻿@model IEnumerable<DoAnWebDemo.Models.LoanApplication>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Quản lý đơn vay";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<div class="container py-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+        <div>
+            <h2 class="fw-black text-dark mb-1"><i class="bi bi-collection-fill text-primary me-2"></i> DANH SÁCH ĐƠN VAY</h2>
+            <p class="text-secondary mb-0">Theo dõi tiến độ và trạng thái các khoản vay của bạn</p>
+        </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Package)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LoanAmount)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TermMonths)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Purpose)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreditScore)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Package.PackageName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LoanAmount)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TermMonths)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Purpose)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreditScore)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+        @if (!User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-blue hover-lift">
+                <i class="bi bi-plus-lg me-2"></i> TẠO ĐƠN MỚI
+            </a>
+        }
+    </div>
+
+    <div class="card border-0 shadow-lg rounded-5 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 custom-table">
+                    <thead class="bg-light">
+                        <tr class="text-secondary small text-uppercase fw-bold">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <th class="ps-4 py-3">Khách hàng</th>
+                            }
+                            <th class="px-4 py-3">Gói sản phẩm</th>
+                            <th class="px-4 py-3">Số tiền / Kỳ hạn</th>
+                            <th class="px-4 py-3 text-center">Tín dụng</th>
+                            <th class="px-4 py-3 text-center">Trạng thái</th>
+                            <th class="px-4 py-3 text-end pe-4">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox display-4 d-block mb-3 opacity-25"></i>
+                                    <p class="fw-medium">Chưa có đơn vay nào được tạo.</p>
+                                </td>
+                            </tr>
+                        }
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-dark">@item.User?.FullName</div>
+                                        <div class="x-small text-muted">@item.User?.Email</div>
+                                    </td>
+                                }
+                                <td class="px-4">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-3 py-2 rounded-pill">
+                                        @item.Package?.PackageName
+                                    </span>
+                                </td>
+                                <td class="px-4">
+                                    <div class="fw-black text-danger">@item.LoanAmount.ToString("#,##0") đ</div>
+                                    <div class="small text-muted fw-medium"><i class="bi bi-clock me-1"></i>@item.TermMonths tháng</div>
+                                </td>
+                                <td class="px-4 text-center">
+                                    <div class="fw-bold @(item.CreditScore >= 700 ? "text-success" : (item.CreditScore >= 400 ? "text-warning" : "text-danger"))">
+                                        @item.CreditScore
+                                    </div>
+                                    <div class="x-small text-muted text-uppercase fw-bold" style="font-size: 0.6rem;">Điểm AI</div>
+                                </td>
+                                <td class="px-4 text-center">
+                                    @switch (item.Status)
+                                    {
+                                        case "Pending":
+                                            <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill border border-warning border-opacity-10 fw-bold">CHỜ DUYỆT</span>
+                                            break;
+                                        case "Approved":
+                                        case "Active":
+                                            <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill border border-success border-opacity-10 fw-bold">ĐÃ DUYỆT</span>
+                                            break;
+                                        case "Rejected":
+                                            <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill border border-danger border-opacity-10 fw-bold">TỪ CHỐI</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-secondary text-white px-3 py-2 rounded-pill">@item.Status</span>
+                                            break;
+                                    }
+                                </td>
+                                <td class="px-4 text-end pe-4">
+                                    <div class="btn-group shadow-sm rounded-pill overflow-hidden border">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-white btn-sm px-3 hover-primary" title="Xem chi tiết">
+                                            <i class="bi bi-eye-fill"></i>
+                                        </a>
+                                        @if (User.IsInRole("Admin") || item.Status == "Pending")
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-white btn-sm px-3 hover-warning" title="Sửa hồ sơ">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-white btn-sm px-3 hover-danger" title="Xóa hồ sơ">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fw-black {
+        font-weight: 900;
+    }
+
+    .x-small {
+        font-size: 0.75rem;
+    }
+
+    .shadow-blue {
+        box-shadow: 0 8px 25px rgba(13, 110, 253, 0.2);
+    }
+
+    .custom-table thead th {
+        border: none;
+    }
+
+    .custom-table tbody tr {
+        transition: all 0.2s;
+    }
+
+        .custom-table tbody tr:hover {
+            background-color: #f8faff;
+        }
+
+    .hover-primary:hover {
+        color: #0d6efd !important;
+        background: #f0f7ff;
+    }
+
+    .hover-warning:hover {
+        color: #ffc107 !important;
+        background: #fffdf0;
+    }
+
+    .hover-danger:hover {
+        color: #dc3545 !important;
+        background: #fff0f0;
+    }
+</style>

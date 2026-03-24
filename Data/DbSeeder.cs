@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using DoAnWebDemo.Models;
 
-namespace DoAnWebDemo.Data // Nhớ đổi namespace theo đúng Project của bạn nếu cần
+namespace DoAnWebDemo.Data
 {
     public static class DbSeeder
     {

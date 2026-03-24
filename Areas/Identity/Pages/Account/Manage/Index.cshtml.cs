@@ -26,51 +26,53 @@ namespace DoAnWebDemo.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string Username { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Phone]
-            [Display(Name = "Phone number")]
+            [Required(ErrorMessage = "Vui lòng nhập Họ và Tên")]
+            [Display(Name = "Họ và tên")]
+            public string FullName { get; set; }
+
+            [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
+            [Display(Name = "Số điện thoại")]
             public string PhoneNumber { get; set; }
+
+            [Required(ErrorMessage = "Vui lòng nhập số CCCD")]
+            [StringLength(12, MinimumLength = 9, ErrorMessage = "CCCD phải từ 9 đến 12 số")]
+            [Display(Name = "Số Căn cước công dân")]
+            public string CCCD { get; set; }
+
+            [Display(Name = "Địa chỉ thường trú")]
+            public string Address { get; set; }
+
+            [Required(ErrorMessage = "Vui lòng nhập thu nhập")]
+            [Range(0, 1000000000, ErrorMessage = "Thu nhập không hợp lệ")]
+            [Display(Name = "Thu nhập hàng tháng (VNĐ)")]
+            public decimal MonthlyIncome { get; set; }
+
+            public bool IsKycVerified { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
         {
             var userName = await _userManager.GetUserNameAsync(user);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-
             Username = userName;
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                FullName = user.FullName,
+                PhoneNumber = user.PhoneNumber,
+                CCCD = user.CCCD,
+                Address = user.Address,
+                MonthlyIncome = user.MonthlyIncome,
+                IsKycVerified = user.IsKycVerified
             };
         }
 
@@ -79,7 +81,7 @@ namespace DoAnWebDemo.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Không thể tải người dùng.");
             }
 
             await LoadAsync(user);
@@ -91,7 +93,7 @@ namespace DoAnWebDemo.Areas.Identity.Pages.Account.Manage
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Không thể tải người dùng.");
             }
 
             if (!ModelState.IsValid)
@@ -100,19 +102,22 @@ namespace DoAnWebDemo.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.PhoneNumber != phoneNumber)
+            // CẬP NHẬT CÁC TRƯỜNG THÔNG TIN MỚI VÀO CSDL
+            user.FullName = Input.FullName;
+            user.PhoneNumber = Input.PhoneNumber;
+            user.CCCD = Input.CCCD;
+            user.Address = Input.Address;
+            user.MonthlyIncome = Input.MonthlyIncome;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
             {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
-                {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
-                    return RedirectToPage();
-                }
+                StatusMessage = "Lỗi: Không thể cập nhật hồ sơ.";
+                return RedirectToPage();
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+            StatusMessage = "Hồ sơ của bạn đã được cập nhật thành công.";
             return RedirectToPage();
         }
     }

@@ -1,0 +1,111 @@
+﻿@model IEnumerable<DoAnWebDemo.Models.ApplicationUser>
+@using Microsoft.AspNetCore.Identity
+@using DoAnWebDemo.Models
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Quản lý Tài Khoản";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4 px-lg-5 min-vh-100 bg-light-soft">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h3 class="fw-black text-dark mb-1 text-uppercase" style="letter-spacing: 1px;">
+                <i class="bi bi-people-fill text-primary me-2"></i> QUẢN LÝ NGƯỜI DÙNG
+            </h3>
+            <p class="text-secondary mb-0 small">Danh sách thành viên và phân quyền hệ thống</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm hover-lift">
+            <i class="bi bi-person-plus-fill me-1"></i> THÊM MỚI
+        </a>
+    </div>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success border-0 shadow-sm rounded-4 p-3 mb-4"><i class="bi bi-check-circle-fill me-2"></i> @TempData["Message"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger border-0 shadow-sm rounded-4 p-3 mb-4"><i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]</div>
+    }
+
+    <div class="card border-0 shadow-sm rounded-5 overflow-hidden bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 custom-table">
+                <thead class="bg-light">
+                    <tr class="text-secondary x-small text-uppercase fw-bold">
+                        <th class="border-0 ps-4 py-4">Tài khoản</th>
+                        <th class="border-0 py-4">CCCD / SDT</th>
+                        <th class="border-0 py-4">Thu nhập / Tín dụng</th>
+                        <th class="border-0 py-4">Vai trò</th>
+                        <th class="border-0 pe-4 py-4 text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        // Lấy vai trò của user (bất đồng bộ trong View không tốt lắm nhưng dùng tạm cho Admin)
+                        var roles = await UserManager.GetRolesAsync(user);
+                        var roleName = roles.FirstOrDefault() ?? "Khách hàng";
+
+                        <tr>
+                            <td class="ps-4 py-3">
+                                <div class="fw-bold text-dark">@user.FullName</div>
+                                <div class="x-small text-muted">@user.Email</div>
+                            </td>
+                            <td>
+                                <div class="small fw-medium">@(user.CCCD ?? "N/A")</div>
+                                <div class="x-small text-muted">@(user.PhoneNumber ?? "N/A")</div>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-success">@user.MonthlyIncome.ToString("#,##0") đ</div>
+                                @if (user.IsKycVerified)
+                                {
+                                    <span class="badge bg-info bg-opacity-10 text-info x-small">eKYC: Đã duyệt</span>
+                                }
+                            </td>
+                            <td>
+                                @if (roleName == "Admin")
+                                {
+                                    <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2">Quản trị viên</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2">Khách hàng</span>
+                                }
+                            </td>
+                            <td class="pe-4 text-end">
+                                <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-outline-danger btn-sm rounded-circle hover-lift"><i class="bi bi-trash3"></i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --light-soft: #f4f7fc;
+    }
+
+    .bg-light-soft {
+        background-color: var(--light-soft);
+    }
+
+    .fw-black {
+        font-weight: 900;
+    }
+
+    .x-small {
+        font-size: 0.72rem;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+</style>
