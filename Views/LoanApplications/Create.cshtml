@@ -74,6 +74,16 @@
                                 </div>
                                 <span asp-validation-for="Purpose" class="text-danger x-small mt-1 d-block ms-2"></span>
                             </div>
+                            <!-- Bước 5: Người thẩm định -->
+                            <div class="mb-4 pt-3 border-top border-light">
+                                <label class="form-label fw-bold text-dark-50 small mb-2"><i class="bi bi-shield-check text-success"></i> NGƯỜI BẢO LÃNH (TÙY CHỌN)</label>
+                                <div class="form-floating custom-floating shadow-sm rounded-4 overflow-hidden border">
+                                    <input asp-for="GuarantorEmail" type="email" class="form-control border-0 bg-light-soft" placeholder="Email người bảo lãnh" />
+                                    <label asp-for="GuarantorEmail">Nhập Email người bảo lãnh (để tăng tỷ lệ duyệt)</label>
+                                </div>
+                                <span asp-validation-for="GuarantorEmail" class="text-danger x-small mt-1 d-block ms-2"></span>
+                            </div>
+
 
                             <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-black py-3 shadow-blue hover-lift transition-all mt-2">
                                 GỬI HỒ SƠ THẨM ĐỊNH <i class="bi bi-send-check-fill ms-2"></i>

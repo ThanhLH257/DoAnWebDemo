@@ -17,6 +17,10 @@ namespace DoAnWebDemo.Data
             if (!await roleManager.RoleExistsAsync("Borrower"))
                 await roleManager.CreateAsync(new IdentityRole("Borrower"));
 
+            // THÊM DÒNG NÀY: Role dành cho người bảo lãnh
+            if (!await roleManager.RoleExistsAsync("Guarantor"))
+                await roleManager.CreateAsync(new IdentityRole("Guarantor"));
+
             // 2. Tự động tạo 1 tài khoản Admin mặc định
             var adminEmail = "admin@gmail.com";
             var adminUser = await userManager.FindByEmailAsync(adminEmail);

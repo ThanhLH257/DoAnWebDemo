@@ -73,10 +73,19 @@
                                         </div>
                                         <div>
                                             <div class="fw-bold text-dark mb-1">@item.User?.FullName</div>
-                                            <div class="x-small text-muted">
+                                            <div class="x-small text-muted mb-2">
                                                 <i class="bi bi-telephone-fill me-1"></i>@(item.User?.PhoneNumber ?? "N/A") &nbsp;|&nbsp;
                                                 <i class="bi bi-person-vcard me-1"></i>@(item.User?.CCCD ?? "N/A")
                                             </div>
+
+                                            <!-- TÍCH HỢP HIỂN THỊ EMAIL NGƯỜI BẢO LÃNH -->
+                                            @if (!string.IsNullOrEmpty(item.GuarantorEmail))
+                                            {
+                                                <div class="p-2 bg-warning bg-opacity-10 rounded-3 border-start border-warning border-3 mt-1" style="font-size: 0.75rem;">
+                                                    <span class="text-muted fw-bold d-block mb-1"><i class="bi bi-shield-check text-warning"></i> Người bảo lãnh:</span>
+                                                    <span class="text-dark fw-bold">@item.GuarantorEmail</span>
+                                                </div>
+                                            }
                                         </div>
                                     </div>
                                 </td>
@@ -88,13 +97,35 @@
                                     </span>
                                 </td>
 
-                                <!-- Số tiền / Điểm TD -->
+                                <!-- Số tiền / Điểm TD & Trạng thái Bảo Lãnh -->
                                 <td class="py-3">
                                     <div class="fw-black text-danger mb-1" style="font-size: 1.1rem;">@item.LoanAmount.ToString("#,##0") đ</div>
                                     <div class="d-flex align-items-center gap-1">
                                         <span class="badge @(item.CreditScore >= 600 ? "bg-success" : (item.CreditScore >= 400 ? "bg-warning" : "bg-danger")) bg-opacity-10 @(item.CreditScore >= 600 ? "text-success" : (item.CreditScore >= 400 ? "text-warning" : "text-danger")) rounded-pill px-2 py-1 x-small fw-bold border border-opacity-25">
                                             Điểm AI: @item.CreditScore
                                         </span>
+                                    </div>
+
+                                    <!-- HIỂN THỊ TÌNH TRẠNG NGƯỜI BẢO LÃNH -->
+                                    <div class="mt-2">
+                                        @if (item.GuaranteeStatus == "Accepted")
+                                        {
+                                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1 x-small fw-bold border border-success border-opacity-25" title="Bảo lãnh bởi: @item.GuarantorEmail">
+                                                <i class="bi bi-shield-check"></i> Đã có bảo lãnh
+                                            </span>
+                                        }
+                                        else if (item.GuaranteeStatus == "Pending")
+                                        {
+                                            <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-2 py-1 x-small fw-bold border border-warning border-opacity-25">
+                                                <i class="bi bi-hourglass-split"></i> Chờ bảo lãnh xác nhận
+                                            </span>
+                                        }
+                                        else if (item.GuaranteeStatus == "Rejected")
+                                        {
+                                            <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-2 py-1 x-small fw-bold border border-danger border-opacity-25">
+                                                <i class="bi bi-shield-x"></i> Bảo lãnh từ chối
+                                            </span>
+                                        }
                                     </div>
                                 </td>
 
@@ -103,7 +134,7 @@
                                     <div class="fw-bold text-dark">@item.TermMonths <span class="fw-normal text-muted small">tháng</span></div>
                                 </td>
 
-                                <!-- Trạng thái -->
+                                <!-- Trạng thái Đơn -->
                                 <td class="py-3 text-center">
                                     @if (item.Status == "Pending")
                                     {
@@ -126,13 +157,19 @@
                                 <!-- Hành động -->
                                 <td class="pe-4 py-3 text-end">
                                     <div class="d-flex gap-2 justify-content-end align-items-center">
+
+                                        <!-- BỔ SUNG NÚT XEM CHI TIẾT -->
+                                        <a asp-area="" asp-controller="LoanApplications" asp-action="Details" asp-route-id="@item.Id" class="btn btn-info text-white btn-sm rounded-pill px-3 fw-bold shadow-sm hover-lift" title="Xem chi tiết hồ sơ">
+                                            <i class="bi bi-eye-fill"></i>
+                                        </a>
+
                                         @if (item.Status == "Pending")
                                         {
                                             <form asp-area="Admin" asp-controller="LoanApprove" asp-action="Approve" asp-route-id="@item.Id" method="post">
-                                                <button type="submit" class="btn btn-success btn-sm rounded-pill px-3 fw-bold shadow-sm hover-lift"><i class="bi bi-check-lg me-1"></i> Duyệt</button>
+                                                <button type="submit" class="btn btn-success btn-sm rounded-pill px-3 fw-bold shadow-sm hover-lift" title="Duyệt hồ sơ"><i class="bi bi-check-lg me-1"></i> Duyệt</button>
                                             </form>
                                             <form asp-area="Admin" asp-controller="LoanApprove" asp-action="Reject" asp-route-id="@item.Id" method="post">
-                                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold hover-lift" onclick="return confirm('Bạn chắc chắn muốn từ chối đơn vay này?');"><i class="bi bi-x-lg me-1"></i> Từ chối</button>
+                                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold hover-lift" title="Từ chối hồ sơ" onclick="return confirm('Bạn chắc chắn muốn từ chối đơn vay này?');"><i class="bi bi-x-lg"></i></button>
                                             </form>
                                         }
                                         else if (item.Status == "Approved")
@@ -142,10 +179,6 @@
                                                     <i class="bi bi-cash-coin me-1"></i> Giải ngân
                                                 </button>
                                             </form>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted x-small italic fw-medium px-3">Đã xử lý</span>
                                         }
                                     </div>
                                 </td>

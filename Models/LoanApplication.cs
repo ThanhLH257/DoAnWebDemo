@@ -43,5 +43,20 @@ namespace DoAnWebDemo.Models
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public ICollection<RepaymentSchedule>? RepaymentSchedules { get; set; }
+
+        // ==========================================
+        // PHẦN BỔ SUNG: THÔNG TIN NGƯỜI BẢO LÃNH
+        // ==========================================
+
+        [Display(Name = "Email người bảo lãnh (Tùy chọn)")]
+        public string? GuarantorEmail { get; set; }
+
+        public string? GuarantorId { get; set; }
+        [ForeignKey("GuarantorId")]
+        public ApplicationUser? Guarantor { get; set; }
+
+        [Display(Name = "Trạng thái bảo lãnh")]
+        // Các trạng thái: None (Không có), Pending (Chờ xác nhận), Accepted (Đã đồng ý), Rejected (Từ chối)
+        public string GuaranteeStatus { get; set; } = "None";
     }
 }
