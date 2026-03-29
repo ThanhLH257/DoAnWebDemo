@@ -106,6 +106,11 @@ namespace DoAnWebDemo.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
 
+                    // ================================================================
+                    // CẬP NHẬT MỚI: Tự động gán quyền "Borrower" cho mọi tài khoản mới
+                    // ================================================================
+                    await _userManager.AddToRoleAsync(user, "Borrower");
+
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -115,7 +120,6 @@ namespace DoAnWebDemo.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    // --- ĐÂY CHÍNH LÀ ĐOẠN GỬI EMAIL ĐÃ ĐƯỢC LÀM ĐẸP BẰNG HTML ---
                     await _emailSender.SendEmailAsync(Input.Email, "Xác nhận tài khoản FastLoan của bạn",
                         $@"
                         <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);'>
@@ -125,7 +129,7 @@ namespace DoAnWebDemo.Areas.Identity.Pages.Account
                             <div style='padding: 30px; background-color: #ffffff;'>
                                 <h2 style='color: #333333; font-size: 20px;'>Xin chào {Input.FullName},</h2>
                                 <p style='font-size: 16px; color: #555555; line-height: 1.5;'>
-                                    Cảm ơn bạn đã đăng ký tài khoản tại <strong>FastLoan VN</strong> - Nền tảng hỗ trợ tài chính trực tuyến hàng đầu.
+                                    Cảm ơn bạn đã đăng ký tài khoản tại <strong>FastLoan VN</strong>.
                                 </p>
                                 <p style='font-size: 16px; color: #555555; line-height: 1.5;'>
                                     Để bắt đầu sử dụng dịch vụ và tạo đơn vay, vui lòng xác nhận địa chỉ email của bạn bằng cách nhấn vào nút bên dưới:
@@ -136,12 +140,8 @@ namespace DoAnWebDemo.Areas.Identity.Pages.Account
                                        XÁC NHẬN TÀI KHOẢN NGAY
                                     </a>
                                 </div>
-                                <p style='font-size: 14px; color: #999999; border-top: 1px solid #eeeeee; padding-top: 20px;'>
-                                    Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này. Thông tin của bạn được bảo mật tuyệt đối.
-                                </p>
                             </div>
                         </div>");
-                    // -------------------------------------------------------------
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
@@ -159,7 +159,6 @@ namespace DoAnWebDemo.Areas.Identity.Pages.Account
                 }
             }
 
-            // If we got this far, something failed, redisplay form
             return Page();
         }
 
@@ -171,9 +170,7 @@ namespace DoAnWebDemo.Areas.Identity.Pages.Account
             }
             catch
             {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
-                    $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
-                    $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'.");
             }
         }
 

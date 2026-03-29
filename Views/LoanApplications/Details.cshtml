@@ -23,6 +23,10 @@
                         {
                             <span class="badge bg-success rounded-pill px-4 py-2 fw-bold">ĐÃ PHÊ DUYỆT</span>
                         }
+                        else if (Model.Status == "Active")
+                        {
+                            <span class="badge bg-primary rounded-pill px-4 py-2 fw-bold">ĐANG HOẠT ĐỘNG</span>
+                        }
                         else
                         {
                             <span class="badge bg-danger rounded-pill px-4 py-2 fw-bold">TỪ CHỐI</span>
@@ -34,7 +38,7 @@
                     <div class="row g-4">
                         <!-- Thông tin khách hàng -->
                         <div class="col-md-6 border-end border-light">
-                            <h6 class="text-primary fw-bold text-uppercase mb-4 ls-1">Khách hàng</h6>
+                            <h6 class="text-primary fw-bold text-uppercase mb-4 ls-1">Khách hàng vay (Chính chủ)</h6>
                             <div class="d-flex align-items-center mb-4">
                                 <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
                                     <i class="bi bi-person-badge-fill text-primary fs-3"></i>
@@ -78,7 +82,36 @@
                             </div>
                         </div>
 
-                        <div class="col-12 mt-5">
+                        <!-- BỔ SUNG: THÔNG TIN NGƯỜI BẢO LÃNH -->
+                        @if (!string.IsNullOrEmpty(Model.GuarantorEmail))
+                        {
+                            <div class="col-12 mt-4">
+                                <h6 class="text-warning fw-bold text-uppercase mb-3 ls-1"><i class="bi bi-shield-check"></i> Thông tin Bảo lãnh</h6>
+                                <div class="p-4 bg-warning bg-opacity-10 rounded-4 border-start border-warning border-4 d-flex justify-content-between align-items-center shadow-sm">
+                                    <div>
+                                        <p class="mb-1 text-dark"><strong>Người bảo lãnh (Email):</strong> <a href="mailto:@Model.GuarantorEmail" class="text-primary fw-bold">@Model.GuarantorEmail</a></p>
+                                        <p class="mb-0 text-dark">
+                                            <strong>Trạng thái pháp lý:</strong>
+                                            @if (Model.GuaranteeStatus == "Accepted")
+                                            {
+                                                <span class="badge bg-success ms-2 px-3 py-2"><i class="bi bi-check2-circle"></i> Đã đồng ý chịu trách nhiệm</span>
+                                            }
+                                            else if (Model.GuaranteeStatus == "Pending")
+                                            {
+                                                <span class="badge bg-warning text-dark ms-2 px-3 py-2"><i class="bi bi-hourglass-split"></i> Đang chờ xác nhận</span>
+                                            }
+                                            else if (Model.GuaranteeStatus == "Rejected")
+                                            {
+                                                <span class="badge bg-danger ms-2 px-3 py-2"><i class="bi bi-x-circle"></i> Đã từ chối bảo lãnh</span>
+                                            }
+                                        </p>
+                                    </div>
+                                    <i class="bi bi-person-bounding-box text-warning opacity-50" style="font-size: 3rem;"></i>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="col-12 mt-4">
                             <h6 class="text-primary fw-bold text-uppercase mb-3 ls-1">Mục đích sử dụng vốn</h6>
                             <div class="p-4 bg-light rounded-4 border-start border-primary border-4 italic text-secondary">
                                 "@Model.Purpose"
@@ -98,3 +131,17 @@
         </div>
     </div>
 </div>
+
+<style>
+    .fw-black {
+        font-weight: 900;
+    }
+
+    .ls-1 {
+        letter-spacing: 1px;
+    }
+
+    .italic {
+        font-style: italic;
+    }
+</style>

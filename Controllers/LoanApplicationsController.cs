@@ -1,14 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using DoAnWebDemo.Data;
+using DoAnWebDemo.Models;
+using DoAnWebDemo.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using DoAnWebDemo.Data;
-using DoAnWebDemo.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authorization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace DoAnWebDemo.Controllers
 {
@@ -17,11 +20,13 @@ namespace DoAnWebDemo.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IEmailSender _emailSender;
 
-        public LoanApplicationsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public LoanApplicationsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IEmailSender emailSender)
         {
             _context = context;
             _userManager = userManager;
+            _emailSender = emailSender; 
         }
 
         // GET: LoanApplications - Danh sách đơn vay
@@ -100,7 +105,8 @@ namespace DoAnWebDemo.Controllers
         // POST: LoanApplications/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PackageId,LoanAmount,TermMonths,Purpose")] LoanApplication loanApplication)
+        // ĐÃ THÊM trường GuarantorEmail vào Bind
+        public async Task<IActionResult> Create([Bind("PackageId,LoanAmount,TermMonths,Purpose,GuarantorEmail")] LoanApplication loanApplication)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
@@ -108,6 +114,36 @@ namespace DoAnWebDemo.Controllers
             ModelState.Remove("UserId");
             ModelState.Remove("User");
             ModelState.Remove("Status");
+            ModelState.Remove("GuaranteeStatus");
+
+            // KIỂM TRA NGƯỜI BẢO LÃNH
+            if (!string.IsNullOrEmpty(loanApplication.GuarantorEmail))
+            {
+                var guarantor = await _userManager.FindByEmailAsync(loanApplication.GuarantorEmail);
+                if (guarantor == null)
+                {
+                    ModelState.AddModelError("GuarantorEmail", "Email người bảo lãnh chưa đăng ký tài khoản trên hệ thống!");
+                }
+                else if (guarantor.Id == user.Id)
+                {
+                    ModelState.AddModelError("GuarantorEmail", "Bạn không thể tự bảo lãnh cho chính mình!");
+                }
+                else
+                {
+                    loanApplication.GuarantorId = guarantor.Id;
+                    loanApplication.GuaranteeStatus = "Pending"; // Chuyển trạng thái chờ họ xác nhận
+
+                    // Cấp luôn quyền Guarantor cho người dùng này nếu họ chưa có
+                    if (!await _userManager.IsInRoleAsync(guarantor, "Guarantor"))
+                    {
+                        await _userManager.AddToRoleAsync(guarantor, "Guarantor");
+                    }
+                }
+            }
+            else
+            {
+                loanApplication.GuaranteeStatus = "None";
+            }
 
             if (ModelState.IsValid)
             {
@@ -117,6 +153,10 @@ namespace DoAnWebDemo.Controllers
 
                 // Thuật toán chấm điểm AI dựa trên thu nhập và kỳ hạn
                 int calculatedScore = (int)(user.MonthlyIncome / 1000000) * 10 - loanApplication.TermMonths;
+
+                // Thuật toán AI: Nếu có người bảo lãnh, cộng thêm 50 điểm tín dụng
+                if (loanApplication.GuaranteeStatus == "Pending") calculatedScore += 50;
+
                 if (calculatedScore < 10) calculatedScore = 10;
                 if (calculatedScore > 990) calculatedScore = 990;
 
@@ -125,7 +165,26 @@ namespace DoAnWebDemo.Controllers
                 _context.Add(loanApplication);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Hồ sơ vay đã được gửi thành công. AI đang thẩm định kết quả!";
+                // === BẮT ĐẦU: GỬI MAIL CHO NGƯỜI BẢO LÃNH ===
+                if (loanApplication.GuaranteeStatus == "Pending")
+                {
+                    string callbackUrl = Url.Action("GuaranteeRequests", "LoanApplications", null, Request.Scheme);
+                    await _emailSender.SendEmailAsync(loanApplication.GuarantorEmail, "YÊU CẦU BẢO LÃNH KHOẢN VAY - FASTLOAN",
+                        $@"
+                        <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 10px;'>
+                            <h2 style='color: #0d6efd;'>FastLoan VN - Yêu cầu bảo lãnh</h2>
+                            <p>Xin chào,</p>
+                            <p>Khách hàng <b>{user.FullName}</b> ({user.PhoneNumber}) vừa chỉ định bạn làm người bảo lãnh cho khoản vay trị giá <b style='color:red;'>{loanApplication.LoanAmount:N0} VNĐ</b>.</p>
+                            <p>Nếu bạn đồng ý, vui lòng đăng nhập vào hệ thống để xác nhận. Bạn sẽ phải chịu trách nhiệm tài chính nếu người vay không hoàn thành nghĩa vụ thanh toán.</p>
+                            <a href='{callbackUrl}' style='display: inline-block; padding: 10px 20px; background-color: #198754; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;'>XEM VÀ XÁC NHẬN</a>
+                        </div>");
+                }
+                // === KẾT THÚC GỬI MAIL ===
+
+                TempData["SuccessMessage"] = "Hồ sơ đã được gửi! Đã gửi Email thông báo cho Người bảo lãnh.";
+                return RedirectToAction(nameof(Index));
+
+                TempData["SuccessMessage"] = "Hồ sơ đã được gửi! Nếu có người bảo lãnh, vui lòng nhắc họ đăng nhập để xác nhận.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -143,7 +202,75 @@ namespace DoAnWebDemo.Controllers
             return View(loanApplication);
         }
 
-        // Các hàm hỗ trợ khác giữ nguyên logic cũ
+        // ==============================================================
+        // PHẦN CHỨC NĂNG DÀNH CHO NGƯỜI BẢO LÃNH (GUARANTOR)
+        // ==============================================================
+
+        // 1. Hiển thị danh sách đơn đang nhờ bảo lãnh
+        [Authorize]
+        public async Task<IActionResult> GuaranteeRequests()
+        {
+            var userId = _userManager.GetUserId(User);
+            var requests = await _context.LoanApplications
+                .Include(l => l.User)
+                .Include(l => l.Package)
+                .Where(l => l.GuarantorId == userId && l.GuaranteeStatus == "Pending")
+                .ToListAsync();
+
+            return View(requests);
+        }
+
+        // 2. Chấp nhận bảo lãnh
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AcceptGuarantee(int id)
+        {
+            var loan = await _context.LoanApplications.FindAsync(id);
+            if (loan != null && loan.GuarantorId == _userManager.GetUserId(User))
+            {
+                loan.GuaranteeStatus = "Accepted";
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Bạn đã chấp nhận bảo lãnh cho khoản vay này!";
+            }
+            return RedirectToAction(nameof(GuaranteeRequests));
+        }
+
+        // 3. Từ chối bảo lãnh
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectGuarantee(int id)
+        {
+            var loan = await _context.LoanApplications.FindAsync(id);
+            if (loan != null && loan.GuarantorId == _userManager.GetUserId(User))
+            {
+                loan.GuaranteeStatus = "Rejected";
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Bạn đã từ chối bảo lãnh.";
+            }
+            return RedirectToAction(nameof(GuaranteeRequests));
+        }
+
+        // Xem các đơn MÌNH ĐÃ CHẤP NHẬN BẢO LÃNH (Kèm theo dõi nợ)
+        [Authorize(Roles = "Guarantor")]
+        public async Task<IActionResult> GuaranteedHistory()
+        {
+            var userId = _userManager.GetUserId(User);
+            var guaranteedLoans = await _context.LoanApplications
+                .Include(l => l.User)
+                .Include(l => l.Package)
+                .Include(l => l.RepaymentSchedules) // Kéo theo Lịch trả nợ để biết người kia có trả không
+                .Where(l => l.GuarantorId == userId && l.GuaranteeStatus == "Accepted")
+                .OrderByDescending(l => l.CreatedAt)
+                .ToListAsync();
+
+            return View(guaranteedLoans);
+        }
+
+
+        // ==============================================================
+        // CÁC CHỨC NĂNG HỖ TRỢ KHÁC (Edit, Delete, ...)
+        // ==============================================================
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();

@@ -1,0 +1,127 @@
+﻿@model IEnumerable<DoAnWebDemo.Models.LoanApplication>
+@{
+    ViewData["Title"] = "Hồ sơ đã bảo lãnh";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <h3 class="fw-black text-dark mb-2"><i class="bi bi-briefcase-fill text-primary me-2"></i> TRÁCH NHIỆM BẢO LÃNH CỦA BẠN</h3>
+    <p class="text-secondary mb-4">Danh sách các khoản vay bạn đã đứng ra bảo lãnh. Vui lòng theo dõi sát sao quá trình trả nợ.</p>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-light border shadow-sm text-center p-5 rounded-4">
+            <i class="bi bi-shield-check text-success display-4 d-block mb-3"></i>
+            Bạn hiện chưa bảo trợ cho bất kỳ khoản vay nào.
+        </div>
+    }
+
+    <div class="row g-4">
+        @foreach (var loan in Model)
+        {
+            // Kiểm tra xem đơn vay này có kỳ nào quá hạn không
+            bool hasOverdue = loan.RepaymentSchedules.Any(s => !s.IsPaid && s.DueDate < DateTime.Now);
+            var overdueCount = loan.RepaymentSchedules.Count(s => !s.IsPaid && s.DueDate < DateTime.Now);
+            var overdueAmount = loan.RepaymentSchedules.Where(s => !s.IsPaid && s.DueDate < DateTime.Now).Sum(s => s.TotalAmount);
+
+            <div class="col-12">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden @(hasOverdue ? "border-start border-danger border-5" : "border-start border-success border-5")">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <!-- Thông tin người vay -->
+                            <div class="col-md-3 border-end">
+                                <h6 class="text-muted small text-uppercase mb-1">Người vay</h6>
+                                <h5 class="fw-bold text-dark mb-1">@loan.User?.FullName</h5>
+                                <p class="text-secondary small mb-0"><i class="bi bi-telephone-fill me-1"></i>@loan.User?.PhoneNumber</p>
+                            </div>
+
+                            <!-- Thông tin khoản vay -->
+                            <div class="col-md-3 border-end px-md-4 mt-3 mt-md-0">
+                                <h6 class="text-muted small text-uppercase mb-1">Khoản vay (@loan.Package?.PackageName)</h6>
+                                <h4 class="fw-black text-primary mb-1">@loan.LoanAmount.ToString("#,##0") đ</h4>
+                                <p class="text-secondary small mb-0">
+                                    Trạng thái:
+                                    <span class="badge @(loan.Status == "Active" ? "bg-success" : "bg-secondary")">@loan.Status</span>
+                                </p>
+                            </div>
+
+                            <!-- Tình trạng thanh toán -->
+                            <div class="col-md-6 px-md-4 mt-3 mt-md-0">
+                                @if (hasOverdue)
+                                {
+                                    <div class="bg-danger bg-opacity-10 rounded-4 p-4 border border-danger border-opacity-25 animate-pulse shadow-sm">
+                                        <div class="d-flex align-items-start mb-3">
+                                            <i class="bi bi-exclamation-octagon-fill text-danger fs-2 me-3"></i>
+                                            <div>
+                                                <h6 class="fw-black text-danger mb-1 text-uppercase ls-1">Cảnh báo: Khách hàng đang trốn nợ!</h6>
+                                                <p class="mb-0 small text-danger fw-medium">
+                                                    Có <strong>@overdueCount</strong> kỳ hạn chưa thanh toán. Tổng số tiền đang nợ: <strong class="fs-6">@overdueAmount.ToString("#,##0") đ</strong>.<br />
+                                                    Là người bảo lãnh, bạn có trách nhiệm thanh toán thay khoản nợ này để tránh bị ghi nhận nợ xấu trên hệ thống CIC.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <!-- HIỂN THỊ DANH SÁCH CÁC KỲ QUÁ HẠN VÀ NÚT THANH TOÁN THAY -->
+                                        <div class="mt-3 bg-white p-3 rounded-3 shadow-sm border border-danger border-opacity-25">
+                                            <h6 class="small fw-bold text-secondary text-uppercase mb-2">Tiến hành thanh toán thay:</h6>
+                                            @foreach (var schedule in loan.RepaymentSchedules.Where(s => !s.IsPaid && s.DueDate < DateTime.Now).OrderBy(s => s.InstallmentNumber))
+                                            {
+                                                <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded mb-2 border">
+                                                    <div class="small">
+                                                        <span class="fw-bold text-dark me-2">Kỳ @schedule.InstallmentNumber</span>
+                                                        <span class="text-muted fw-normal">(Hạn: @schedule.DueDate.ToString("dd/MM/yyyy"))</span>
+                                                    </div>
+                                                    <div class="d-flex align-items-center gap-3">
+                                                        <span class="text-danger fw-black fs-6">@schedule.TotalAmount.ToString("#,##0") đ</span>
+                                                        <form asp-controller="Payment" asp-action="PayInstallment" asp-route-id="@schedule.Id" method="post">
+                                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill fw-bold px-3 shadow-sm hover-lift"
+                                                                    onclick="return confirm('Xác nhận thanh toán thay số tiền @schedule.TotalAmount.ToString("#,##0") đ cho kỳ này?');">
+                                                                THANH TOÁN THAY
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="bg-success bg-opacity-10 rounded-3 p-3 border border-success border-opacity-25">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-check-circle-fill text-success fs-3 me-3"></i>
+                                            <div>
+                                                <h6 class="fw-bold text-success mb-0">Thanh toán đúng hạn</h6>
+                                                <p class="mb-0 small text-success opacity-75">Người vay đang thực hiện tốt nghĩa vụ.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .animate-pulse {
+        animation: pulse-border 1.5s infinite;
+    }
+
+    @@keyframes pulse-border {
+        0% {
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+        }
+    }
+</style>

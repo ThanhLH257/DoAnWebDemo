@@ -282,6 +282,21 @@
                                 <li class="nav-item"><a class="nav-link text-white" asp-area="" asp-controller="LoanApplications" asp-action="Index">Đơn vay</a></li>
                                 <li class="nav-item"><a class="nav-link text-white" asp-area="" asp-controller="LoanApplications" asp-action="Create">Vay tiền</a></li>
                                 <li class="nav-item"><a class="nav-link text-white" asp-area="" asp-controller="Payment" asp-action="Index">Trả nợ</a></li>
+
+                                @if (User.IsInRole("Guarantor"))
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link text-warning fw-bold px-3" asp-area="" asp-controller="LoanApplications" asp-action="GuaranteeRequests">
+                                            <i class="bi bi-shield-exclamation"></i> Yêu cầu bảo lãnh
+                                        </a>
+                                    </li>
+                                    <!-- THÊM LINK LỊCH SỬ BẢO LÃNH NÀY VÀO -->
+                                    <li class="nav-item">
+                                        <a class="nav-link text-danger fw-bold px-3" asp-area="" asp-controller="LoanApplications" asp-action="GuaranteedHistory">
+                                            <i class="bi bi-briefcase-fill"></i> Lịch sử Bảo lãnh
+                                        </a>
+                                    </li>
+                                }
                             }
                         }
                         else
